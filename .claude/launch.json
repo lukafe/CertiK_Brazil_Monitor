@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "monitor-webapp",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "3777"],
+      "cwd": "webapp",
+      "port": 3777
+    }
+  ]
+}

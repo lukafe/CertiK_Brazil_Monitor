@@ -1,0 +1,23 @@
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# node / next
+node_modules/
+.next/
+tsconfig.tsbuildinfo
+
+# cópia do banco gerada no build (fonte canônica é data/monitor.db)
+webapp/data/
+
+# logs e temporários
+*.log
+nohup.out
+.DS_Store
+
+# credenciais e config local
+.claude/settings.local.json
+
+# caches pesados do pipeline
+cnpj_data/
