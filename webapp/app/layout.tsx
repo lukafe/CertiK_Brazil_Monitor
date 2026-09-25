@@ -1,33 +1,28 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Link from "next/link";
 import "./globals.css";
+import Sidebar from "@/components/sidebar";
+import Topbar from "@/components/topbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "CertiK MONITOR Brasil",
   description: "Monitoramento do universo PSAV — Res. BCB 520",
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body className={`${inter.className} bg-[#0b0e14] text-slate-200 min-h-screen antialiased`}>
-        <header className="sticky top-0 z-20 border-b border-slate-800 bg-[#0b0e14]/90 backdrop-blur">
-          <div className="mx-auto max-w-7xl px-4 py-3 flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="inline-block h-7 w-7 rounded bg-gradient-to-br from-emerald-400 to-cyan-500" />
-              <span className="text-lg font-semibold tracking-tight text-white">
-                CertiK <span className="text-emerald-400">MONITOR</span> Brasil
-              </span>
-            </Link>
-            <span className="ml-auto text-xs text-slate-500">
-              Universo PSAV · Res. BCB 520 · uso interno
-            </span>
-          </div>
-        </header>
-        <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
+      <body className={`${inter.className} min-h-screen bg-ink-950 text-slate-200 antialiased`}>
+        <Sidebar />
+        <div className="pl-14 lg:pl-56">
+          <Topbar />
+          <main className="px-4 py-5 lg:px-6">{children}</main>
+        </div>
       </body>
     </html>
   );

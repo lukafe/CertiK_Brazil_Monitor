@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 body {
-  background: #0b0e14;
+  background: #0b0d10;
+}
+
+::selection {
+  background: rgba(63, 224, 168, 0.25);
 }
 
 ::-webkit-scrollbar {
@@ -11,6 +15,9 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #23272d;
   border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
 }

@@ -79,16 +79,75 @@ export type Fato = {
 
 export type InstComRating = Instituicao & Rating;
 
-export function listInstituicoes(): InstComRating[] {
-  return db()
+export type LinksInst = {
+  site?: string;
+  twitter?: string;
+  linkedin?: string;
+  instagram?: string;
+};
+
+const GENERIC_MAIL = new Set([
+  "gmail.com", "hotmail.com", "outlook.com", "yahoo.com", "yahoo.com.br",
+  "uol.com.br", "bol.com.br", "terra.com.br", "icloud.com", "live.com",
+  "msn.com", "globo.com", "ig.com.br", "protonmail.com", "proton.me",
+]);
+const TERCEIROS = ["contab", "advocacia", "advogad", "juridic", "adv.br", "escritorio", "assessoria"];
+
+export function siteFromEmail(email: string | null): string | undefined {
+  const e = (email ?? "").toLowerCase().trim();
+  if (!e.includes("@")) return undefined;
+  const dom = e.split("@").pop()!;
+  if (!dom.includes(".") || GENERIC_MAIL.has(dom) || TERCEIROS.some((t) => dom.includes(t))) return undefined;
+  return `https://${dom}`;
+}
+
+export function montarLinks(pares: { fonte: string | null; url: string | null }[], email: string | null): LinksInst {
+  const links: LinksInst = {};
+  for (const { fonte, url } of pares) {
+    if (!url) continue;
+    if (fonte === "osint_dominio" && !links.site) links.site = url;
+    else if (fonte === "osint_twitter" && !links.twitter) links.twitter = url;
+    else if (fonte === "osint_linkedin" && !links.linkedin) links.linkedin = url;
+    else if (fonte === "osint_instagram" && !links.instagram) links.instagram = url;
+  }
+  if (!links.site) links.site = siteFromEmail(email);
+  return links;
+}
+
+export type InstComLinks = InstComRating & { links: LinksInst };
+
+export function listInstituicoes(): InstComLinks[] {
+  const rows = db()
     .prepare(
       `SELECT i.*, r.regulatorio, r.atividade, r.ecossistema, r.pessoas, r.solidez,
-              COALESCE(r.rating, 0) rating, COALESCE(r.nota, 'D') nota, r.via
+              COALESCE(r.rating, 0) rating, COALESCE(r.nota, 'D') nota, r.via,
+              l.links_osint
        FROM instituicoes i
        LEFT JOIN ratings r ON r.cnpj = i.cnpj AND r.mes_ref = i.mes_ref
+       LEFT JOIN (
+         SELECT cnpj, GROUP_CONCAT(fonte || '|' || url, ';;') links_osint
+         FROM fatos WHERE url IS NOT NULL AND fonte LIKE 'osint_%'
+         GROUP BY cnpj
+       ) l ON l.cnpj = i.cnpj
        ORDER BY r.rating DESC, i.razao_social ASC`
     )
-    .all() as InstComRating[];
+    .all() as (InstComRating & { links_osint: string | null })[];
+  return rows.map((r) => {
+    const pares = (r.links_osint ?? "")
+      .split(";;")
+      .filter(Boolean)
+      .map((p) => {
+        const i = p.indexOf("|");
+        return { fonte: p.slice(0, i), url: p.slice(i + 1) };
+      });
+    const { links_osint: _drop, ...resto } = r;
+    void _drop;
+    return { ...resto, links: montarLinks(pares, r.email) };
+  });
+}
+
+export function getRandomCnpj(): string {
+  return (db().prepare("SELECT cnpj FROM instituicoes ORDER BY RANDOM() LIMIT 1").get() as { cnpj: string }).cnpj;
 }
 
 export function getInstituicao(cnpj: string): InstComRating | undefined {
@@ -136,6 +195,48 @@ export function getEventos(cnpj: string): Evento[] {
       "SELECT mes_ref, tipo, descricao, criado_em FROM eventos WHERE cnpj = ? ORDER BY criado_em DESC"
     )
     .all(cnpj) as Evento[];
+}
+
+export type FeedItem = {
+  criado_em: string;
+  tipo: string;
+  descricao: string | null;
+  url: string | null;
+  fonte: string | null;
+  cnpj: string;
+  razao_social: string;
+  nome_fantasia: string | null;
+  nota: string;
+  rating: number;
+};
+
+export function getFeedFatos(limit = 30): FeedItem[] {
+  return db()
+    .prepare(
+      `SELECT f.criado_em, f.tipo, f.descricao, f.url, f.fonte, i.cnpj, i.razao_social, i.nome_fantasia,
+              COALESCE(r.nota, 'D') nota, COALESCE(r.rating, 0) rating
+       FROM fatos f
+       JOIN instituicoes i ON i.cnpj = f.cnpj
+       LEFT JOIN ratings r ON r.cnpj = i.cnpj AND r.mes_ref = i.mes_ref
+       WHERE f.tipo IN ('noticia', 'site', 'associacao', 'evento')
+       ORDER BY f.criado_em DESC, f.rowid DESC
+       LIMIT ?`
+    )
+    .all(limit) as FeedItem[];
+}
+
+export type Setor = { segmento: string; n: number; media: number };
+
+export function getSetores(): Setor[] {
+  return db()
+    .prepare(
+      `SELECT i.segmento, COUNT(*) n, AVG(COALESCE(r.rating, 0)) media
+       FROM instituicoes i
+       LEFT JOIN ratings r ON r.cnpj = i.cnpj AND r.mes_ref = i.mes_ref
+       GROUP BY i.segmento
+       ORDER BY n DESC`
+    )
+    .all() as Setor[];
 }
 
 export function getStats() {
