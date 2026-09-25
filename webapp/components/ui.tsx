@@ -34,7 +34,8 @@ export function segCurto(seg: string | null) {
   return palavras.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function limparDescricao(d: string) {
+export function limparDescricao(d: string | null) {
+  if (!d) return "";
   const semUrl = d.replace(/https?:\/\/\S+/g, "").replace(/\s{2,}/g, " ").replace(/[:—-]\s*$/, "").trim();
   return semUrl || d;
 }
