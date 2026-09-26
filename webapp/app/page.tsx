@@ -1,9 +1,8 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { getFeedFatos, getSetores, getStats, listInstituicoes, type InstComRating } from "@/lib/db";
 import { Avatar, HexIcon, NotaBadge, Painel, ScoreChip, limparDescricao, segCurto } from "@/components/ui";
 import Tabela from "./tabela";
-
-export const dynamic = "force-dynamic";
 
 function fmtFeedData(d: string) {
   // "YYYY-MM-DD HH:MM:SS" → "MM-DD HH:MM"
@@ -72,7 +71,7 @@ function Ranking({ titulo, itens }: { titulo: string; itens: InstComRating[] }) 
   );
 }
 
-export default function Home({ searchParams }: { searchParams: { q?: string; origem?: string; grupos?: string } }) {
+export default function Home() {
   const stats = getStats();
   const rows = listInstituicoes();
   const setores = getSetores();
@@ -125,12 +124,9 @@ export default function Home({ searchParams }: { searchParams: { q?: string; ori
               ))}
             </div>
           </div>
-          <Tabela
-            rows={rows}
-            buscaInicial={searchParams.q ?? ""}
-            origemInicial={searchParams.origem ?? ""}
-            soGrupos={searchParams.grupos === "1"}
-          />
+          <Suspense>
+            <Tabela rows={rows} />
+          </Suspense>
         </section>
       </div>
 

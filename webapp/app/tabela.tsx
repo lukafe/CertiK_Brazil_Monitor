@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { InstComLinks } from "@/lib/db";
 import { Avatar, LinksExternos, NOTAS, NotaBadge, OrigemChip, ScoreChip, ViaChip, segCurto } from "@/components/ui";
 
@@ -26,17 +27,11 @@ function capitalNum(c: string | null) {
 type ColOrd = "rating" | "razao_social" | "segmento" | "uf";
 const PAGINA = 50;
 
-export default function Tabela({
-  rows,
-  buscaInicial = "",
-  origemInicial = "",
-  soGrupos = false,
-}: {
-  rows: InstComLinks[];
-  buscaInicial?: string;
-  origemInicial?: string;
-  soGrupos?: boolean;
-}) {
+export default function Tabela({ rows }: { rows: InstComLinks[] }) {
+  const params = useSearchParams();
+  const buscaInicial = params.get("q") ?? "";
+  const origemInicial = params.get("origem") ?? "";
+  const soGrupos = params.get("grupos") === "1";
   const [busca, setBusca] = useState(buscaInicial);
   const [origem, setOrigem] = useState(origemInicial);
   const [segmento, setSegmento] = useState("");

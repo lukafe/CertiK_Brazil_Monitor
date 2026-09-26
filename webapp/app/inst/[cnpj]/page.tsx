@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getEventos, getFatos, getGrupoMembros, getInstituicao, getSnapshots, montarLinks } from "@/lib/db";
+import { getEventos, getFatos, getGrupoMembros, getInstituicao, getSnapshots, getTodosCnpjs, montarLinks } from "@/lib/db";
 import { Avatar, LinksExternos, NotaBadge, OrigemChip, Painel, ViaChip, limparDescricao, segCurto } from "@/components/ui";
 import Radar from "@/components/radar";
 import Sparkline from "@/components/sparkline";
 import Share from "@/components/share";
 
-export const dynamic = "force-dynamic";
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return getTodosCnpjs().map((cnpj) => ({ cnpj }));
+}
 
 function fmtCnpj(c: string) {
   return c.length === 14

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import { getRandomCnpj } from "@/lib/db";
+import cnpjs from "@/lib/cnpjs.json";
 
 export const dynamic = "force-dynamic";
 
 export function GET() {
-  redirect(`/inst/${getRandomCnpj()}`);
+  redirect(`/inst/${cnpjs[Math.floor(Math.random() * cnpjs.length)]}`);
 }

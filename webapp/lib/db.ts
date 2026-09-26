@@ -146,8 +146,8 @@ export function listInstituicoes(): InstComLinks[] {
   });
 }
 
-export function getRandomCnpj(): string {
-  return (db().prepare("SELECT cnpj FROM instituicoes ORDER BY RANDOM() LIMIT 1").get() as { cnpj: string }).cnpj;
+export function getTodosCnpjs(): string[] {
+  return (db().prepare("SELECT cnpj FROM instituicoes").all() as { cnpj: string }[]).map((r) => r.cnpj);
 }
 
 export function getInstituicao(cnpj: string): InstComRating | undefined {

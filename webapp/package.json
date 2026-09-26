@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node -e \"const fs=require('fs');fs.mkdirSync('data',{recursive:true});if(fs.existsSync('../data/monitor.db'))fs.copyFileSync('../data/monitor.db','data/monitor.db')\"",
+    "prebuild": "node scripts/prep.js",
+    "predev": "node scripts/prep.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
