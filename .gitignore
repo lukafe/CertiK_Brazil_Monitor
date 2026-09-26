@@ -21,3 +21,6 @@ nohup.out
 
 # caches pesados do pipeline
 cnpj_data/
+
+# ambiente local
+.env

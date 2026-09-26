@@ -42,6 +42,27 @@ CREATE TABLE IF NOT EXISTS eventos (
 );
 CREATE INDEX IF NOT EXISTS idx_snap_cnpj ON snapshots(cnpj);
 CREATE INDEX IF NOT EXISTS idx_evt_cnpj ON eventos(cnpj);
+CREATE TABLE IF NOT EXISTS enriquecimento (
+    cnpj TEXT PRIMARY KEY,
+    descricao TEXT, produtos TEXT,
+    site TEXT, x TEXT, linkedin TEXT, instagram TEXT,
+    fonte TEXT, confianca REAL,
+    atualizado_em TEXT DEFAULT (datetime('now'))
+);
+CREATE TABLE IF NOT EXISTS tags (
+    cnpj TEXT, tag TEXT, confianca REAL,
+    UNIQUE (cnpj, tag)
+);
+CREATE INDEX IF NOT EXISTS idx_tags_cnpj ON tags(cnpj);
+CREATE TABLE IF NOT EXISTS monitor_config (
+    cnpj TEXT PRIMARY KEY,
+    ativo INTEGER DEFAULT 0,       -- 1 = monitoramento contínuo ligado
+    aliases TEXT,                  -- JSON: nomes pelos quais a empresa aparece na imprensa
+    site TEXT, url_produtos TEXT, url_blog TEXT, url_carreiras TEXT,
+    gupy_slug TEXT, linkedin_url TEXT,
+    prioridade INTEGER DEFAULT 2,  -- 1 alta | 2 média | 3 baixa
+    atualizado_em TEXT DEFAULT (datetime('now'))
+);
 """
 
 
