@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { InstComLinks } from "@/lib/db";
-import { Avatar, LinksExternos, NOTAS, NotaBadge, OrigemChip, ScoreChip, ViaChip, segCurto } from "@/components/ui";
+import { Avatar, LinksExternos, NOTAS, NotaBadge, OrigemChip, ScoreChip, TAG_LABEL, TagChip, ViaChip, segCurto } from "@/components/ui";
 
 function Sinal({ on, title, children }: { on: boolean; title: string; children: React.ReactNode }) {
   return (
@@ -37,6 +37,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
   const [segmento, setSegmento] = useState("");
   const [uf, setUf] = useState("");
   const [via, setVia] = useState("");
+  const [tag, setTag] = useState("");
   const [notaMin, setNotaMin] = useState("");
   const [capMin, setCapMin] = useState(0);
   const [soAtivas, setSoAtivas] = useState(false);
@@ -50,6 +51,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
   useEffect(() => setOrigem(origemInicial), [origemInicial]);
 
   const segmentos = useMemo(() => Array.from(new Set(rows.map((r) => r.segmento))).sort(), [rows]);
+  const tagsDisponiveis = useMemo(() => Array.from(new Set(rows.flatMap((r) => r.tags))).sort(), [rows]);
   const ufs = useMemo(() => Array.from(new Set(rows.map((r) => r.uf).filter(Boolean))).sort() as string[], [rows]);
 
   const filtradas = useMemo(() => {
@@ -66,6 +68,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
         (!segmento || r.segmento === segmento) &&
         (!uf || r.uf === uf) &&
         (!via || (r.via ?? "").startsWith(via)) &&
+        (!tag || r.tags.includes(tag)) &&
         NOTAS.indexOf(r.nota) <= notaIdx &&
         capitalNum(r.capital_social) >= capMin &&
         (!soAtivas || r.situacao === "02") &&
@@ -80,7 +83,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
       return dir * va.localeCompare(vb, "pt-BR");
     });
     return out;
-  }, [rows, busca, origem, segmento, uf, via, notaMin, capMin, soAtivas, comAssociacao, soGrupos, ordCol, ordAsc]);
+  }, [rows, busca, origem, segmento, uf, via, tag, notaMin, capMin, soAtivas, comAssociacao, soGrupos, ordCol, ordAsc]);
 
   // Unifica entidades do mesmo grupo: mantém a primeira (melhor na ordenação) e conta as demais
   const exibidas = useMemo(() => {
@@ -102,7 +105,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
     return out;
   }, [filtradas, agrupar]);
 
-  useEffect(() => setLimite(PAGINA), [busca, origem, segmento, uf, via, notaMin, capMin, soAtivas, comAssociacao, agrupar, soGrupos]);
+  useEffect(() => setLimite(PAGINA), [busca, origem, segmento, uf, via, tag, notaMin, capMin, soAtivas, comAssociacao, agrupar, soGrupos]);
 
   const pagina = exibidas.slice(0, limite);
 
@@ -173,6 +176,16 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
             </option>
           ))}
         </select>
+        {tagsDisponiveis.length > 0 && (
+          <select className={sel} value={tag} onChange={(e) => setTag(e.target.value)}>
+            <option value="">Atividade: todas</option>
+            {tagsDisponiveis.map((t) => (
+              <option key={t} value={t}>
+                {TAG_LABEL[t] ?? t}
+              </option>
+            ))}
+          </select>
+        )}
         <select className={sel} value={uf} onChange={(e) => setUf(e.target.value)}>
           <option value="">UF: todas</option>
           {ufs.map((u) => (
@@ -213,6 +226,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
               <th className="px-3 py-2.5 font-medium">Via BCB</th>
               <th className="px-3 py-2.5 font-medium">Origem</th>
               <Th col="segmento">Segmento</Th>
+              <th className="px-3 py-2.5 font-medium">Atividades</th>
               <th className="px-3 py-2.5 font-medium">Sinais</th>
               <th className="px-3 py-2.5 font-medium">Links</th>
               <Th col="uf">UF</Th>
@@ -257,6 +271,18 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
                 </td>
                 <td className="px-3 py-2 text-xs text-slate-400" title={r.segmento}>
                   {segCurto(r.segmento)}
+                </td>
+                <td className="px-3 py-2">
+                  {r.tags.length > 0 ? (
+                    <div className="flex items-center gap-1" title={r.tags.map((t) => TAG_LABEL[t] ?? t).join(", ")}>
+                      {r.tags.slice(0, 3).map((t) => (
+                        <TagChip key={t} tag={t} mini />
+                      ))}
+                      {r.tags.length > 3 && <span className="text-[10px] text-slate-500">+{r.tags.length - 3}</span>}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-slate-600">—</span>
+                  )}
                 </td>
                 <td className="px-3 py-2">
                   <div className="flex gap-1">

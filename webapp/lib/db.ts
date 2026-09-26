@@ -114,16 +114,44 @@ export function montarLinks(pares: { fonte: string | null; url: string | null }[
   return links;
 }
 
-export type InstComLinks = InstComRating & { links: LinksInst };
+export type InstComLinks = InstComRating & { links: LinksInst; tags: string[] };
+
+export type Enriquecimento = {
+  cnpj: string;
+  descricao: string | null;
+  produtos: string | null;
+  site: string | null;
+  x: string | null;
+  linkedin: string | null;
+  instagram: string | null;
+  fonte: string | null;
+  confianca: number | null;
+  atualizado_em: string;
+};
+
+export function getEnriquecimento(cnpj: string): (Enriquecimento & { tags: string[] }) | undefined {
+  const e = db().prepare("SELECT * FROM enriquecimento WHERE cnpj = ?").get(cnpj) as Enriquecimento | undefined;
+  if (!e) return undefined;
+  const tags = (db().prepare("SELECT tag FROM tags WHERE cnpj = ? ORDER BY tag").all(cnpj) as { tag: string }[]).map(
+    (t) => t.tag
+  );
+  return { ...e, tags };
+}
 
 export function listInstituicoes(): InstComLinks[] {
   const rows = db()
     .prepare(
       `SELECT i.*, r.regulatorio, r.atividade, r.ecossistema, r.pessoas, r.solidez,
               COALESCE(r.rating, 0) rating, COALESCE(r.nota, 'D') nota, r.via,
-              l.links_osint
+              l.links_osint,
+              e.site e_site, e.x e_x, e.linkedin e_linkedin, e.instagram e_instagram,
+              t.tags_csv
        FROM instituicoes i
        LEFT JOIN ratings r ON r.cnpj = i.cnpj AND r.mes_ref = i.mes_ref
+       LEFT JOIN enriquecimento e ON e.cnpj = i.cnpj
+       LEFT JOIN (
+         SELECT cnpj, GROUP_CONCAT(tag, ',') tags_csv FROM (SELECT cnpj, tag FROM tags ORDER BY tag) GROUP BY cnpj
+       ) t ON t.cnpj = i.cnpj
        LEFT JOIN (
          SELECT cnpj, GROUP_CONCAT(fonte || '|' || url, ';;') links_osint
          FROM fatos WHERE url IS NOT NULL AND fonte LIKE 'osint_%'
@@ -131,7 +159,14 @@ export function listInstituicoes(): InstComLinks[] {
        ) l ON l.cnpj = i.cnpj
        ORDER BY r.rating DESC, i.razao_social ASC`
     )
-    .all() as (InstComRating & { links_osint: string | null })[];
+    .all() as (InstComRating & {
+    links_osint: string | null;
+    e_site: string | null;
+    e_x: string | null;
+    e_linkedin: string | null;
+    e_instagram: string | null;
+    tags_csv: string | null;
+  })[];
   return rows.map((r) => {
     const pares = (r.links_osint ?? "")
       .split(";;")
@@ -140,9 +175,14 @@ export function listInstituicoes(): InstComLinks[] {
         const i = p.indexOf("|");
         return { fonte: p.slice(0, i), url: p.slice(i + 1) };
       });
-    const { links_osint: _drop, ...resto } = r;
-    void _drop;
-    return { ...resto, links: montarLinks(pares, r.email) };
+    const { links_osint: _a, e_site, e_x, e_linkedin, e_instagram, tags_csv, ...resto } = r;
+    void _a;
+    const links = montarLinks(pares, r.email);
+    if (e_site) links.site = e_site;
+    if (e_x) links.twitter = e_x;
+    if (e_linkedin) links.linkedin = e_linkedin;
+    if (e_instagram) links.instagram = e_instagram;
+    return { ...resto, links, tags: (tags_csv ?? "").split(",").filter(Boolean) };
   });
 }
 

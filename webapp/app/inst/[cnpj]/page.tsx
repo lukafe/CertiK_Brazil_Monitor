@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getEventos, getFatos, getGrupoMembros, getInstituicao, getSnapshots, getTodosCnpjs, montarLinks } from "@/lib/db";
-import { Avatar, LinksExternos, NotaBadge, OrigemChip, Painel, ViaChip, limparDescricao, segCurto } from "@/components/ui";
+import { getEnriquecimento, getEventos, getFatos, getGrupoMembros, getInstituicao, getSnapshots, getTodosCnpjs, montarLinks } from "@/lib/db";
+import { Avatar, LinksExternos, NotaBadge, OrigemChip, Painel, TagChip, ViaChip, limparDescricao, segCurto } from "@/components/ui";
 import Radar from "@/components/radar";
 import Sparkline from "@/components/sparkline";
 import Share from "@/components/share";
@@ -124,7 +124,13 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
   ).length;
 
   const nome = inst.nome_fantasia || inst.razao_social;
+  const enr = getEnriquecimento(params.cnpj);
   const links = montarLinks(fatos.map((f) => ({ fonte: f.fonte, url: f.url })), inst.email);
+  if (enr?.site) links.site = enr.site;
+  if (enr?.x) links.twitter = enr.x;
+  if (enr?.linkedin) links.linkedin = enr.linkedin;
+  if (enr?.instagram) links.instagram = enr.instagram;
+  const produtos: string[] = enr?.produtos ? JSON.parse(enr.produtos) : [];
 
   return (
     <div className="grid gap-5 xl:grid-cols-[1fr_400px]">
@@ -344,6 +350,28 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
             </div>
             {inst.nome_fantasia && <div className="mt-2 truncate text-xs text-slate-500">{inst.razao_social}</div>}
             <div className="mt-1 font-mono text-xs text-slate-500">{fmtCnpj(inst.cnpj)}</div>
+
+            {(enr?.descricao || (enr?.tags.length ?? 0) > 0) && (
+              <div className="mt-4 border-t border-edge pt-4">
+                {enr?.descricao && <p className="text-sm leading-relaxed text-slate-300">{enr.descricao}</p>}
+                {enr && enr.tags.length > 0 && (
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {enr.tags.map((t) => (
+                      <TagChip key={t} tag={t} />
+                    ))}
+                  </div>
+                )}
+                {produtos.length > 0 && (
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {produtos.slice(0, 6).map((p) => (
+                      <span key={p} className="rounded-full border border-edge bg-ink-800 px-2 py-0.5 text-[11px] text-slate-400">
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="mt-4 grid grid-cols-4 gap-2 border-t border-edge pt-4">
               {[

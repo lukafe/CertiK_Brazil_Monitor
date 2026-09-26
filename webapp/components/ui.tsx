@@ -40,6 +40,33 @@ export function limparDescricao(d: string | null) {
   return semUrl || d;
 }
 
+export const TAG_LABEL: Record<string, string> = {
+  intermediacao: "Intermediação",
+  custodia_propria: "Custódia própria",
+  custodia_terceirizada: "Custódia terceirizada",
+  otc: "OTC",
+  tokenizacao: "Tokenização",
+  pagamentos: "Pagamentos",
+  staking: "Staking",
+  gestao_ativos: "Gestão de ativos",
+  infraestrutura: "Infraestrutura",
+  banco_digital: "Banco digital",
+  drex_cbdc: "Drex/CBDC",
+  consultoria: "Consultoria",
+};
+
+export function TagChip({ tag, mini = false }: { tag: string; mini?: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center whitespace-nowrap rounded-full border border-certik/25 bg-certik/10 font-medium text-certik ${
+        mini ? "px-1.5 py-px text-[10px]" : "px-2 py-0.5 text-[11px]"
+      }`}
+    >
+      {TAG_LABEL[tag] ?? tag}
+    </span>
+  );
+}
+
 export function notaClasses(nota: string) {
   switch (nota) {
     case "AAA":
@@ -316,16 +343,14 @@ export function LinksExternos({
   );
 }
 
-export function ShieldLogo({ size = 28 }: { size?: number }) {
+export function ShieldLogo({ size = 28, cor = "#d5114d" }: { size?: number; cor?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24">
-      <path
-        d="M12 2 L21 5.5 V12 C21 17.5 17 21 12 22.5 C7 21 3 17.5 3 12 V5.5 Z"
-        fill="none"
-        stroke="#3fe0a8"
-        strokeWidth="1.8"
-      />
-      <path d="M12 5.5 L17.5 7.6 V12 C17.5 15.6 15.2 18.2 12 19.3 Z" fill="#3fe0a8" fillOpacity="0.85" />
+    <svg width={size} height={size} viewBox="0 0 200 212" fill="none" stroke={cor} strokeWidth="17">
+      <path d="M40 35 L100 12 L160 35" />
+      <path d="M15 33 C8 120 38 182 100 204" />
+      <path d="M185 33 C192 120 162 182 100 204" />
+      <path d="M25 62 L100 204 L175 62" />
+      <path d="M56 108 H144" />
     </svg>
   );
 }

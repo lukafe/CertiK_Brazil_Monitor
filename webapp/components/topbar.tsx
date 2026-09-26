@@ -54,12 +54,25 @@ export default function Topbar() {
               <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z" />
             </svg>
           </span>
-          <span className="hidden h-9 w-9 items-center justify-center rounded-xl border border-edge bg-ink-900 text-slate-500 md:flex" title="pt-BR">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+          <button
+            onClick={() => {
+              const { pathname, search } = window.location;
+              const sep = search ? "&" : "?";
+              window.open(
+                `https://certik--monitor--brasil-vercel-app.translate.goog${pathname}${search}${sep}_x_tr_sl=pt&_x_tr_tl=en&_x_tr_hl=en`,
+                "_blank",
+                "noopener"
+              );
+            }}
+            title="Translate to English (Google Translate)"
+            className="hidden h-9 items-center gap-1.5 rounded-xl border border-edge bg-ink-900 px-3 text-xs font-semibold text-slate-300 transition-colors hover:border-brand/50 hover:text-brand-bright md:flex"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
               <circle cx="12" cy="12" r="9" />
               <path d="M3 12h18M12 3c2.8 2.6 4 5.7 4 9s-1.2 6.4-4 9c-2.8-2.6-4-5.7-4-9s1.2-6.4 4-9Z" />
             </svg>
-          </span>
+            EN
+          </button>
           <span className="rounded-xl border border-edge bg-ink-900 px-3 py-2 text-xs font-medium text-slate-300">
             Uso interno
           </span>

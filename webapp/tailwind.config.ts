@@ -23,6 +23,10 @@ const config: Config = {
           dim: "#123126",
           deep: "#0d2b20",
         },
+        brand: {
+          DEFAULT: "#d5114d",
+          bright: "#f0356e",
+        },
       },
     },
   },

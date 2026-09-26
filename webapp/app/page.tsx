@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { getFeedFatos, getSetores, getStats, listInstituicoes, type InstComRating } from "@/lib/db";
-import { Avatar, HexIcon, NotaBadge, Painel, ScoreChip, limparDescricao, segCurto } from "@/components/ui";
+import { getFeedFatos, getSetores, getStats, listInstituicoes, type InstComLinks, type InstComRating } from "@/lib/db";
+import { Avatar, HexIcon, NotaBadge, Painel, ScoreChip, TagChip, limparDescricao, segCurto } from "@/components/ui";
 import Tabela from "./tabela";
 
 function fmtFeedData(d: string) {
@@ -17,7 +17,7 @@ const TIPO_FEED: Record<string, string> = {
   evento: "Evento",
 };
 
-function TrendingCard({ r }: { r: InstComRating }) {
+function TrendingCard({ r }: { r: InstComLinks }) {
   const nome = r.nome_fantasia || r.razao_social;
   return (
     <Link
@@ -40,6 +40,13 @@ function TrendingCard({ r }: { r: InstComRating }) {
         <HexIcon score={r.rating} />
         <NotaBadge nota={r.nota} />
       </div>
+      {r.tags.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {r.tags.slice(0, 2).map((t) => (
+            <TagChip key={t} tag={t} mini />
+          ))}
+        </div>
+      )}
     </Link>
   );
 }

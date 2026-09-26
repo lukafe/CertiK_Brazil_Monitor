@@ -78,8 +78,8 @@ function Nav() {
               ativo ? "bg-ink-700 text-white" : "text-slate-400 hover:bg-ink-800 hover:text-slate-200"
             }`}
           >
-            {ativo && <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded bg-certik" />}
-            <span className={ativo ? "text-certik" : ""}>{it.icone}</span>
+            {ativo && <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded bg-brand" />}
+            <span className={ativo ? "text-brand-bright" : ""}>{it.icone}</span>
             <span className="hidden lg:inline">{it.label}</span>
           </Link>
         );
@@ -98,7 +98,7 @@ export default function Sidebar() {
           <span className="block text-[9px] font-medium tracking-[0.35em] text-slate-500">— SKYNET —</span>
         </span>
       </Link>
-      <div className="hidden px-4 pt-2 text-[10px] font-medium uppercase tracking-widest text-certik lg:block">
+      <div className="hidden px-4 pt-2 text-[10px] font-medium uppercase tracking-widest text-brand-bright lg:block">
         Monitor Brasil
       </div>
       <Suspense fallback={null}>
