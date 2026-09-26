@@ -1,0 +1,12 @@
+# Feeds setoriais do coletor de notícias (coletor_noticias.py).
+# Formato: nome_da_fonte: url_do_feed (uma por linha). Adicione/remova à vontade.
+valor: https://pox.globo.com/rss/valor
+infomoney: https://www.infomoney.com.br/feed/
+portal_do_bitcoin: https://portaldobitcoin.uol.com.br/feed/
+livecoins: https://livecoins.com.br/feed/
+criptofacil: https://www.criptofacil.com/feed/
+moneytimes: https://www.moneytimes.com.br/feed/
+neofeed: https://neofeed.com.br/feed/
+fintechs_com_br: https://fintechs.com.br/feed/
+beincrypto_brasil: https://br.beincrypto.com/feed/
+# fora do ar: cointelegraph_brasil (410 Gone), finsiders e startups.com.br (403 anti-bot)

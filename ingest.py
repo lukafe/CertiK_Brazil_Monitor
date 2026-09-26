@@ -54,6 +54,20 @@ CREATE TABLE IF NOT EXISTS tags (
     UNIQUE (cnpj, tag)
 );
 CREATE INDEX IF NOT EXISTS idx_tags_cnpj ON tags(cnpj);
+CREATE TABLE IF NOT EXISTS itens_brutos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    url TEXT, url_hash TEXT UNIQUE,
+    titulo TEXT, fonte TEXT, publicado_em TEXT,
+    texto TEXT,
+    coletado_em TEXT DEFAULT (datetime('now')),
+    processado INTEGER DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS itens_instituicao (
+    item_id INTEGER, cnpj TEXT, metodo TEXT, score_match REAL,
+    UNIQUE (item_id, cnpj)
+);
+CREATE INDEX IF NOT EXISTS idx_itens_proc ON itens_brutos(processado);
+CREATE INDEX IF NOT EXISTS idx_itens_inst_cnpj ON itens_instituicao(cnpj);
 CREATE TABLE IF NOT EXISTS monitor_config (
     cnpj TEXT PRIMARY KEY,
     ativo INTEGER DEFAULT 0,       -- 1 = monitoramento contínuo ligado
