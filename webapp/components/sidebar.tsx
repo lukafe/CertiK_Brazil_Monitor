@@ -30,7 +30,7 @@ const ITENS = [
   {
     href: "/?origem=INCUMBENTE",
     chave: "INCUMBENTE",
-    label: "Incumbentes",
+    label: "Incumbents",
     icone: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6" />
@@ -40,7 +40,7 @@ const ITENS = [
   {
     href: "/?grupos=1",
     chave: "grupos",
-    label: "Grupos",
+    label: "Groups",
     icone: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <circle cx="7" cy="8" r="3" />
@@ -60,7 +60,7 @@ function Nav() {
   return (
     <nav className="mt-4 space-y-1 px-2">
       <div className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-600">
-        Universo
+        Universe
       </div>
       {ITENS.map((it) => {
         const ativo =
@@ -105,9 +105,9 @@ export default function Sidebar() {
         <Nav />
       </Suspense>
       <div className="mt-auto hidden border-t border-edge px-4 py-3 text-[10px] leading-relaxed text-slate-600 lg:block">
-        Universo PSAV
+        PSAV universe
         <br />
-        Res. BCB 520 · uso interno
+        Res. BCB 520 · internal use
       </div>
     </aside>
   );

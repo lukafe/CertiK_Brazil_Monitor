@@ -6,20 +6,20 @@ import { limparDescricao } from "@/components/ui";
 
 /** Badge de cor por tipo de fato (Etapa 7 — timeline filtrável). */
 export const TIPO_BADGE: Record<string, { rotulo: string; cls: string }> = {
-  noticia: { rotulo: "📰 Notícia", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
-  site: { rotulo: "🌐 Site", cls: "bg-sky-500/15 text-sky-300 border-sky-500/30" },
-  vaga: { rotulo: "💼 Vaga", cls: "bg-violet-500/15 text-violet-300 border-violet-500/30" },
-  pessoa: { rotulo: "👤 Pessoa", cls: "bg-rose-500/15 text-rose-300 border-rose-500/30" },
-  associacao: { rotulo: "🤝 Associação", cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
-  evento: { rotulo: "🎤 Evento", cls: "bg-orange-500/15 text-orange-300 border-orange-500/30" },
-  manual: { rotulo: "✍️ Curadoria", cls: "bg-ink-700 text-slate-400 border-edge" },
+  noticia: { rotulo: "📰 News", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
+  site: { rotulo: "🌐 Website", cls: "bg-sky-500/15 text-sky-300 border-sky-500/30" },
+  vaga: { rotulo: "💼 Job opening", cls: "bg-violet-500/15 text-violet-300 border-violet-500/30" },
+  pessoa: { rotulo: "👤 Person", cls: "bg-rose-500/15 text-rose-300 border-rose-500/30" },
+  associacao: { rotulo: "🤝 Association", cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
+  evento: { rotulo: "🎤 Event", cls: "bg-orange-500/15 text-orange-300 border-orange-500/30" },
+  manual: { rotulo: "✍️ Curation", cls: "bg-ink-700 text-slate-400 border-edge" },
 };
 
 const PERIODOS: [string, number | null][] = [
-  ["7 dias", 7],
-  ["30 dias", 30],
-  ["90 dias", 90],
-  ["Tudo", null],
+  ["7 days", 7],
+  ["30 days", 30],
+  ["90 days", 90],
+  ["All", null],
 ];
 
 export function TipoBadge({ tipo }: { tipo: string }) {
@@ -63,7 +63,7 @@ export default function Timeline({ fatos }: { fatos: Fato[] }) {
             tipo === null ? "border-certik/50 bg-certik/15 text-certik" : "border-edge bg-ink-800 text-slate-400 hover:text-slate-200"
           }`}
         >
-          Todos ({fatos.length})
+          All ({fatos.length})
         </button>
         {tiposPresentes.map((t) => (
           <button
@@ -99,8 +99,8 @@ export default function Timeline({ fatos }: { fatos: Fato[] }) {
               <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500">
                 <span className="font-mono text-rose-400/80">{dataDoFato(f)}</span>
                 <TipoBadge tipo={f.tipo} />
-                {f.fonte && <span>fonte: {f.fonte}</span>}
-                <span>confiança {(f.confianca * 100).toFixed(0)}%</span>
+                {f.fonte && <span>source: {f.fonte}</span>}
+                <span>confidence {(f.confianca * 100).toFixed(0)}%</span>
               </div>
               <div className="mt-0.5 text-sm leading-relaxed text-slate-300">
                 {limparDescricao(f.descricao)}
@@ -114,7 +114,7 @@ export default function Timeline({ fatos }: { fatos: Fato[] }) {
           ))}
         </ol>
       ) : (
-        <p className="p-4 text-sm text-slate-500">Nenhum fato no filtro selecionado.</p>
+        <p className="p-4 text-sm text-slate-500">No facts match the selected filter.</p>
       )}
     </div>
   );

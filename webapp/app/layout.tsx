@@ -8,12 +8,12 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "CertiK MONITOR Brasil",
-  description: "Monitoramento do universo PSAV — Res. BCB 520",
+  description: "Monitoring of the Brazilian PSAV universe — Res. BCB 520",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="en">
       <body className={`${inter.className} min-h-screen bg-ink-950 text-slate-200 antialiased`}>
         <Sidebar />
         <div className="pl-14 lg:pl-56">

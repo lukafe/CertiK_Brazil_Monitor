@@ -146,22 +146,22 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
       <div className="flex flex-wrap items-center gap-2">
         <input
           className={`${sel} w-56`}
-          placeholder="Filtrar nome, CNPJ ou sócio..."
+          placeholder="Filter by name, CNPJ or partner..."
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
         />
         <select className={sel} value={origem} onChange={(e) => setOrigem(e.target.value)}>
-          <option value="">Origem: todas</option>
+          <option value="">Origin: all</option>
           <option value="SPSAV">SPSAV</option>
-          <option value="INCUMBENTE">Incumbente</option>
+          <option value="INCUMBENTE">Incumbent</option>
         </select>
         <select className={sel} value={via} onChange={(e) => setVia(e.target.value)}>
-          <option value="">Via: todas</option>
-          <option value="IN 701">IN 701 (comunicação)</option>
-          <option value="IN 704">IN 704 (autorização)</option>
+          <option value="">Path: all</option>
+          <option value="IN 701">IN 701 (communication)</option>
+          <option value="IN 704">IN 704 (authorization)</option>
         </select>
         <select className={sel} value={notaMin} onChange={(e) => setNotaMin(e.target.value)}>
-          <option value="">Nota: todas</option>
+          <option value="">Grade: all</option>
           {NOTAS.slice(0, 6).map((n) => (
             <option key={n} value={n}>
               ≥ {n}
@@ -169,7 +169,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
           ))}
         </select>
         <select className={sel} value={segmento} onChange={(e) => setSegmento(e.target.value)}>
-          <option value="">Segmento: todos</option>
+          <option value="">Segment: all</option>
           {segmentos.map((s) => (
             <option key={s} value={s}>
               {segCurto(s)}
@@ -178,7 +178,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
         </select>
         {tagsDisponiveis.length > 0 && (
           <select className={sel} value={tag} onChange={(e) => setTag(e.target.value)}>
-            <option value="">Atividade: todas</option>
+            <option value="">Activity: all</option>
             {tagsDisponiveis.map((t) => (
               <option key={t} value={t}>
                 {TAG_LABEL[t] ?? t}
@@ -187,32 +187,32 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
           </select>
         )}
         <select className={sel} value={uf} onChange={(e) => setUf(e.target.value)}>
-          <option value="">UF: todas</option>
+          <option value="">State: all</option>
           {ufs.map((u) => (
             <option key={u}>{u}</option>
           ))}
         </select>
         <select className={sel} value={capMin} onChange={(e) => setCapMin(Number(e.target.value))}>
-          <option value={0}>Capital: qualquer</option>
-          <option value={1_000_000}>≥ R$ 1 mi</option>
-          <option value={10_000_000}>≥ R$ 10 mi</option>
-          <option value={100_000_000}>≥ R$ 100 mi</option>
-          <option value={1_000_000_000}>≥ R$ 1 bi</option>
+          <option value={0}>Capital: any</option>
+          <option value={1_000_000}>≥ R$ 1M</option>
+          <option value={10_000_000}>≥ R$ 10M</option>
+          <option value={100_000_000}>≥ R$ 100M</option>
+          <option value={1_000_000_000}>≥ R$ 1B</option>
         </select>
         <label className={chk}>
           <input type="checkbox" checked={soAtivas} onChange={(e) => setSoAtivas(e.target.checked)} className="accent-[#3fe0a8]" />
-          só ativas
+          active only
         </label>
         <label className={chk}>
           <input type="checkbox" checked={comAssociacao} onChange={(e) => setComAssociacao(e.target.checked)} className="accent-[#3fe0a8]" />
-          em associação
+          in association
         </label>
         <label className={chk}>
           <input type="checkbox" checked={agrupar} onChange={(e) => setAgrupar(e.target.checked)} className="accent-[#3fe0a8]" />
-          unificar grupos
+          merge groups
         </label>
         <span className="ml-auto text-xs tabular-nums text-slate-500">
-          {agrupar ? `${exibidas.length} grupos/instituições · ${filtradas.length} entidades` : `${filtradas.length} entidades`}
+          {agrupar ? `${exibidas.length} groups/institutions · ${filtradas.length} entities` : `${filtradas.length} entities`}
         </span>
       </div>
 
@@ -221,15 +221,15 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
           <thead className="sticky top-0 z-10 bg-ink-900 text-left text-[11px] uppercase tracking-wider text-slate-500">
             <tr className="border-b border-edge">
               <th className="px-3 py-2.5 font-medium">#</th>
-              <Th col="razao_social">Instituição</Th>
+              <Th col="razao_social">Institution</Th>
               <Th col="rating">Score</Th>
-              <th className="px-3 py-2.5 font-medium">Via BCB</th>
-              <th className="px-3 py-2.5 font-medium">Origem</th>
-              <Th col="segmento">Segmento</Th>
-              <th className="px-3 py-2.5 font-medium">Atividades</th>
-              <th className="px-3 py-2.5 font-medium">Sinais</th>
+              <th className="px-3 py-2.5 font-medium">BCB path</th>
+              <th className="px-3 py-2.5 font-medium">Origin</th>
+              <Th col="segmento">Segment</Th>
+              <th className="px-3 py-2.5 font-medium">Activities</th>
+              <th className="px-3 py-2.5 font-medium">Signals</th>
               <th className="px-3 py-2.5 font-medium">Links</th>
-              <Th col="uf">UF</Th>
+              <Th col="uf">State</Th>
             </tr>
           </thead>
           <tbody>
@@ -248,7 +248,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
                       {extras > 0 && (
                         <span
                           className="ml-2 rounded-full border border-edge bg-ink-700 px-2 py-0.5 text-[10px] text-slate-300"
-                          title={`Grupo ${r.grupo_nome}: mais ${extras} entidade${extras > 1 ? "s" : ""} no universo`}
+                          title={`Group ${r.grupo_nome}: ${extras} more entit${extras > 1 ? "ies" : "y"} in the universe`}
                         >
                           ⛓ +{extras}
                         </span>
@@ -286,10 +286,10 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
                 </td>
                 <td className="px-3 py-2">
                   <div className="flex gap-1">
-                    <Sinal on={(r.ecossistema ?? 0) > 0} title="Membro de associação do setor">🤝</Sinal>
-                    <Sinal on={r.sinal_grupo_spsav === 1 || !!r.socio_comum} title="Grupo econômico / sócio ligado a SPSAV">🔗</Sinal>
-                    <Sinal on={r.sinal_site === 1} title="Site menciona cripto/tokenização">🌐</Sinal>
-                    <Sinal on={r.sinal_noticias === 1} title="Notícias de atividade em ativos virtuais">📰</Sinal>
+                    <Sinal on={(r.ecossistema ?? 0) > 0} title="Member of an industry association">🤝</Sinal>
+                    <Sinal on={r.sinal_grupo_spsav === 1 || !!r.socio_comum} title="Economic group / partner linked to an SPSAV">🔗</Sinal>
+                    <Sinal on={r.sinal_site === 1} title="Website mentions crypto/tokenization">🌐</Sinal>
+                    <Sinal on={r.sinal_noticias === 1} title="News on virtual-asset activity">📰</Sinal>
                   </div>
                 </td>
                 <td className="px-3 py-2">
@@ -306,7 +306,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
               onClick={() => setLimite(limite + PAGINA)}
               className="rounded-lg border border-edge bg-ink-800 px-4 py-2 text-xs font-medium text-slate-300 transition-colors hover:border-certik/40 hover:text-certik"
             >
-              Mostrar mais ({exibidas.length - limite} restantes)
+              Show more ({exibidas.length - limite} remaining)
             </button>
           </div>
         )}

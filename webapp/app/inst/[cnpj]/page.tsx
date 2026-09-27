@@ -78,7 +78,7 @@ function SinalLinha({ nome, on, evidencia }: { nome: string; on: boolean | null;
         >
           {on ? "✓" : "–"}
         </span>
-        {on ? "Detectado" : "Não detectado"}
+        {on ? "Detected" : "Not detected"}
       </span>
     </div>
   );
@@ -86,11 +86,11 @@ function SinalLinha({ nome, on, evidencia }: { nome: string; on: boolean | null;
 
 const TABS: [string, string][] = [
   ["#visao", "Pulse Feed"],
-  ["#regulatorio", "Regulatório"],
-  ["#sinais", "Sinais"],
-  ["#cadastro", "Cadastro"],
-  ["#grupo", "Grupo"],
-  ["#socios", "Sócios"],
+  ["#regulatorio", "Regulatory"],
+  ["#sinais", "Signals"],
+  ["#cadastro", "Registry"],
+  ["#grupo", "Group"],
+  ["#socios", "Partners"],
 ];
 
 export default function InstituicaoPage({ params }: { params: { cnpj: string } }) {
@@ -102,11 +102,11 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
   const grupo = inst.grupo_id ? getGrupoMembros(inst.grupo_id).filter((m) => m.cnpj !== inst.cnpj) : [];
 
   const pilares: [string, number, number | null][] = [
-    ["Regulatório", 0.3, inst.regulatorio],
-    ["Atividade pública", 0.25, inst.atividade],
-    ["Ecossistema", 0.2, inst.ecossistema],
-    ["Pessoas", 0.15, inst.pessoas],
-    ["Solidez", 0.1, inst.solidez],
+    ["Regulatory", 0.3, inst.regulatorio],
+    ["Public activity", 0.25, inst.atividade],
+    ["Ecosystem", 0.2, inst.ecossistema],
+    ["People", 0.15, inst.pessoas],
+    ["Financial strength", 0.1, inst.solidez],
   ];
 
   const nNoticias = fatos.filter((f) => f.tipo === "noticia").length;
@@ -157,7 +157,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
           className="scroll-mt-20"
           titulo={
             <span className="flex items-center gap-2">
-              Pulse Feed & Fatos
+              Pulse Feed & Facts
               <span className="rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-semibold text-rose-400">
                 {fatos.length}
               </span>
@@ -167,14 +167,14 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
           {fatos.length ? (
             <Timeline fatos={fatos} />
           ) : (
-            <p className="p-4 text-sm text-slate-500">Nenhum fato coletado ainda para esta instituição.</p>
+            <p className="p-4 text-sm text-slate-500">No facts collected yet for this institution.</p>
           )}
         </Painel>
 
         <section id="regulatorio" className="scroll-mt-20 overflow-hidden rounded-xl border border-edge bg-ink-900">
           <div className="flex items-center gap-3 border-b border-edge bg-gradient-to-r from-certik-deep/60 to-transparent px-4 py-4">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-certik/15 text-lg">🛡️</span>
-            <h2 className="text-lg font-semibold text-white">Pilares do Rating</h2>
+            <h2 className="text-lg font-semibold text-white">Rating Pillars</h2>
             <span className="ml-auto flex items-center gap-1.5 text-certik">
               <span className="text-xl font-bold">{inst.rating.toFixed(0)}</span>
               <span className="text-xs text-slate-500">/100</span>
@@ -185,45 +185,45 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
               <PilarBar key={n} nome={n} peso={peso} valor={valor} />
             ))}
             <div className="mt-2 rounded-lg border border-edge bg-ink-800 px-3 py-2.5 text-xs text-slate-400">
-              Via regulatória: <span className="text-slate-200">{inst.via ?? "—"}</span>
+              Regulatory path: <span className="text-slate-200">{inst.via ?? "—"}</span>
               {inst.via?.startsWith("IN 701")
-                ? " — instituição já autorizada pelo BCB; entrada em ativos virtuais por comunicação."
-                : " — nova entrante; requer autorização prévia do BCB."}
+                ? " — institution already authorized by the BCB; entry into virtual assets via communication."
+                : " — new entrant; requires prior BCB authorization."}
             </div>
           </div>
         </section>
 
         {inst.origem === "INCUMBENTE" && (
-          <Painel id="sinais" className="scroll-mt-20" titulo="Sinais de movimento em ativos virtuais" acao={<span className="text-[11px] text-slate-500">{nSinais} ativo{nSinais === 1 ? "" : "s"}</span>}>
+          <Painel id="sinais" className="scroll-mt-20" titulo="Signals of movement into virtual assets" acao={<span className="text-[11px] text-slate-500">{nSinais} active</span>}>
             <div className="px-4 py-1.5">
               <SinalLinha
-                nome="Grupo econômico ligado a SPSAV"
+                nome="Economic group linked to an SPSAV"
                 on={inst.sinal_grupo_spsav === 1}
-                evidencia={inst.socio_comum ? `Sócio em comum: ${inst.socio_comum}` : null}
+                evidencia={inst.socio_comum ? `Common partner: ${inst.socio_comum}` : null}
               />
-              <SinalLinha nome="Site menciona cripto/tokenização" on={inst.sinal_site === 1} evidencia={inst.evidencia_site} />
-              <SinalLinha nome="Notícias de atividade" on={inst.sinal_noticias === 1} evidencia={inst.evidencia_noticias} />
-              <SinalLinha nome="Nome sugere digital assets" on={inst.sinal_nome === 1} />
+              <SinalLinha nome="Website mentions crypto/tokenization" on={inst.sinal_site === 1} evidencia={inst.evidencia_site} />
+              <SinalLinha nome="News on activity" on={inst.sinal_noticias === 1} evidencia={inst.evidencia_noticias} />
+              <SinalLinha nome="Name suggests digital assets" on={inst.sinal_nome === 1} />
             </div>
           </Painel>
         )}
 
-        <Painel id="cadastro" className="scroll-mt-20" titulo="Cadastro">
+        <Painel id="cadastro" className="scroll-mt-20" titulo="Registry data">
           <div className="grid grid-cols-2 gap-4 p-4 md:grid-cols-3">
-            <Campo label="Segmento">{inst.segmento}</Campo>
-            <Campo label="Situação">{inst.situacao === "02" ? "Ativa" : inst.situacao}</Campo>
-            <Campo label="Início de atividade">{fmtData(inst.data_inicio)}</Campo>
-            <Campo label="Capital social">{fmtCapital(inst.capital_social)}</Campo>
-            <Campo label="CNAE principal">{inst.cnae_principal}</Campo>
-            <Campo label="Localização">{[inst.municipio, inst.uf].filter(Boolean).join(" / ")}</Campo>
+            <Campo label="Segment">{inst.segmento}</Campo>
+            <Campo label="Status">{inst.situacao === "02" ? "Active" : inst.situacao}</Campo>
+            <Campo label="Activity start">{fmtData(inst.data_inicio)}</Campo>
+            <Campo label="Share capital">{fmtCapital(inst.capital_social)}</Campo>
+            <Campo label="Main CNAE">{inst.cnae_principal}</Campo>
+            <Campo label="Location">{[inst.municipio, inst.uf].filter(Boolean).join(" / ")}</Campo>
             <Campo label="E-mail">{inst.email?.toLowerCase()}</Campo>
-            <Campo label="Telefone">{inst.telefone}</Campo>
-            <Campo label="Mês de referência">{inst.mes_ref}</Campo>
+            <Campo label="Phone">{inst.telefone}</Campo>
+            <Campo label="Reference month">{inst.mes_ref}</Campo>
           </div>
         </Painel>
 
         {grupo.length > 0 && (
-          <Painel id="grupo" className="scroll-mt-20" titulo={`Grupo ${inst.grupo_nome} — outras entidades (${grupo.length})`}>
+          <Painel id="grupo" className="scroll-mt-20" titulo={`Group ${inst.grupo_nome} — other entities (${grupo.length})`}>
             <ul className="divide-y divide-edge/60">
               {grupo.map((m) => (
                 <li key={m.cnpj}>
@@ -245,7 +245,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
         )}
 
         {inst.socios && (
-          <Painel id="socios" className="scroll-mt-20" titulo="Sócios">
+          <Painel id="socios" className="scroll-mt-20" titulo="Partners">
             <ul className="divide-y divide-edge/60 text-sm text-slate-300">
               {inst.socios.split(" | ").map((s, i) => (
                 <li key={i} className="flex items-center gap-3 px-4 py-2">
@@ -258,7 +258,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
         )}
 
         <div className="grid gap-5 md:grid-cols-2">
-          <Painel titulo="Histórico de score">
+          <Painel titulo="Score history">
             {snapshots.length ? (
               <div className="p-4">
                 <div className="flex items-baseline justify-between text-xs text-slate-500">
@@ -271,7 +271,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
                 </div>
               </div>
             ) : (
-              <p className="p-4 text-sm text-slate-500">Sem histórico ainda.</p>
+              <p className="p-4 text-sm text-slate-500">No history yet.</p>
             )}
           </Painel>
           <Painel titulo="Timeline">
@@ -285,7 +285,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
                 ))}
               </ul>
             ) : (
-              <p className="p-4 text-sm text-slate-500">Nenhum evento — será populada nos próximos runs mensais.</p>
+              <p className="p-4 text-sm text-slate-500">No events yet — populated by the upcoming monthly runs.</p>
             )}
           </Painel>
         </div>
@@ -308,7 +308,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
                   <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
-                    🏅 {inst.origem === "SPSAV" ? "SPSAV" : "Incumbente"} · {inst.via?.startsWith("IN 701") ? "IN 701" : "IN 704"}
+                    🏅 {inst.origem === "SPSAV" ? "SPSAV" : "Incumbent"} · {inst.via?.startsWith("IN 701") ? "IN 701" : "IN 704"}
                   </span>
                   <OrigemChip origem={inst.origem} />
                   <ViaChip via={inst.via} />
@@ -343,9 +343,9 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
             <div className="mt-4 grid grid-cols-4 gap-2 border-t border-edge pt-4">
               {[
                 ["Capital", fmtCapital(inst.capital_social)],
-                ["UF", inst.uf ?? "—"],
-                ["Início", fmtData(inst.data_inicio)?.slice(-4) ?? "—"],
-                ["Situação", inst.situacao === "02" ? "Ativa" : inst.situacao ?? "—"],
+                ["State", inst.uf ?? "—"],
+                ["Since", fmtData(inst.data_inicio)?.slice(-4) ?? "—"],
+                ["Status", inst.situacao === "02" ? "Active" : inst.situacao ?? "—"],
               ].map(([l, v]) => (
                 <div key={l as string}>
                   <div className="text-[10px] uppercase tracking-wider text-slate-600">{l}</div>
@@ -368,20 +368,20 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
             <Radar
               size={320}
               eixos={pilares.map(([label, , valor]) => ({
-                label: label === "Atividade pública" ? "Atividade" : label,
+                label: label === "Public activity" ? "Activity" : label === "Financial strength" ? "Strength" : label,
                 valor: valor ?? 0,
               }))}
             />
             <div className="mb-3 flex items-center justify-between rounded-lg border border-edge bg-ink-800 px-3 py-2.5">
-              <span className="text-[10px] uppercase tracking-wider text-slate-500">Presença online</span>
+              <span className="text-[10px] uppercase tracking-wider text-slate-500">Online presence</span>
               <LinksExternos links={links} nome={inst.razao_social} />
             </div>
             <div className="grid grid-cols-4 gap-2">
               {[
-                { n: fatos.length, cls: "bg-certik/10 text-certik", icone: "🛡", t: "Fatos coletados" },
-                { n: nPessoas, cls: "bg-sky-500/10 text-sky-300", icone: "ℹ", t: "Pessoas-chave" },
-                { n: nNoticias, cls: "bg-amber-500/10 text-amber-300", icone: "!", t: "Notícias" },
-                { n: nSinais, cls: "bg-ink-700 text-slate-400", icone: "⚠", t: "Sinais ativos" },
+                { n: fatos.length, cls: "bg-certik/10 text-certik", icone: "🛡", t: "Facts collected" },
+                { n: nPessoas, cls: "bg-sky-500/10 text-sky-300", icone: "ℹ", t: "Key people" },
+                { n: nNoticias, cls: "bg-amber-500/10 text-amber-300", icone: "!", t: "News" },
+                { n: nSinais, cls: "bg-ink-700 text-slate-400", icone: "⚠", t: "Active signals" },
               ].map((c, i) => (
                 <div key={i} title={c.t} className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-semibold ${c.cls}`}>
                   <span className="text-xs opacity-80">{c.icone}</span>
@@ -393,10 +393,10 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
         </Painel>
 
         {grupo.length > 0 && (
-          <Painel titulo="Grupo econômico">
+          <Painel titulo="Economic group">
             <div className="flex flex-wrap gap-2 p-4">
               <span className="rounded-lg border border-edge bg-ink-800 px-2.5 py-1.5 text-xs text-slate-400">
-                ⛓ {inst.grupo_nome} · {grupo.length + 1} entidades
+                ⛓ {inst.grupo_nome} · {grupo.length + 1} entities
               </span>
               {grupo.slice(0, 6).map((m) => (
                 <Link

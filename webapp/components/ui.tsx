@@ -8,22 +8,22 @@ function semAcento(s: string) {
 
 const SEG_CURTO: [string, string][] = [
   ["SPSAV", "SPSAV"],
-  ["BANCO MULTIPLO", "Banco Múltiplo"],
-  ["BANCO COMERCIAL", "Banco Comercial"],
-  ["BANCO DE INVESTIMENTO", "Banco de Investimento"],
-  ["BANCO DE CAMBIO", "Banco de Câmbio"],
-  ["BANCO", "Banco"],
-  ["CAIXA ECON", "Caixa Econômica"],
-  ["CORRETORA DE TVM", "Corretora TVM"],
-  ["CORRETORA DE TITULOS", "Corretora TVM"],
-  ["DISTRIBUIDORA DE TVM", "Distribuidora TVM"],
-  ["DISTRIBUIDORA DE TITULOS", "Distribuidora TVM"],
-  ["CORRETORA DE CAMBIO", "Corretora de Câmbio"],
+  ["BANCO MULTIPLO", "Multiple Bank"],
+  ["BANCO COMERCIAL", "Commercial Bank"],
+  ["BANCO DE INVESTIMENTO", "Investment Bank"],
+  ["BANCO DE CAMBIO", "FX Bank"],
+  ["BANCO", "Bank"],
+  ["CAIXA ECON", "Savings Bank"],
+  ["CORRETORA DE TVM", "Securities Broker"],
+  ["CORRETORA DE TITULOS", "Securities Broker"],
+  ["DISTRIBUIDORA DE TVM", "Securities Dealer"],
+  ["DISTRIBUIDORA DE TITULOS", "Securities Dealer"],
+  ["CORRETORA DE CAMBIO", "FX Broker"],
   ["CREDITO DIRETO", "SCD"],
   ["EMPRESTIMO ENTRE PESSOAS", "SEP"],
-  ["INSTITUICAO DE PAGAMENTO", "IP"],
-  ["CREDITO, FINANCIAMENTO", "Financeira"],
-  ["CREDITO IMOBILIARIO", "Cia. Crédito Imobiliário"],
+  ["INSTITUICAO DE PAGAMENTO", "Payment Institution"],
+  ["CREDITO, FINANCIAMENTO", "Finance Company"],
+  ["CREDITO IMOBILIARIO", "Mortgage Company"],
 ];
 
 export function segCurto(seg: string | null) {
@@ -41,18 +41,18 @@ export function limparDescricao(d: string | null) {
 }
 
 export const TAG_LABEL: Record<string, string> = {
-  intermediacao: "Intermediação",
-  custodia_propria: "Custódia própria",
-  custodia_terceirizada: "Custódia terceirizada",
+  intermediacao: "Intermediation",
+  custodia_propria: "Self-custody",
+  custodia_terceirizada: "Third-party custody",
   otc: "OTC",
-  tokenizacao: "Tokenização",
-  pagamentos: "Pagamentos",
+  tokenizacao: "Tokenization",
+  pagamentos: "Payments",
   staking: "Staking",
-  gestao_ativos: "Gestão de ativos",
-  infraestrutura: "Infraestrutura",
-  banco_digital: "Banco digital",
+  gestao_ativos: "Asset management",
+  infraestrutura: "Infrastructure",
+  banco_digital: "Digital banking",
   drex_cbdc: "Drex/CBDC",
-  consultoria: "Consultoria",
+  consultoria: "Consulting",
 };
 
 export function TagChip({ tag, mini = false }: { tag: string; mini?: boolean }) {
@@ -196,7 +196,7 @@ export function OrigemChip({ origem }: { origem: string }) {
         origem === "SPSAV" ? "bg-certik/15 text-certik" : "bg-sky-500/15 text-sky-300"
       }`}
     >
-      {origem}
+      {origem === "INCUMBENTE" ? "INCUMBENT" : origem}
     </span>
   );
 }
@@ -315,7 +315,7 @@ export function LinksExternos({
         </LinkIcone>
       )}
       {links.twitter && (
-        <LinkIcone mini={mini} href={links.twitter} title="Perfil no X">
+        <LinkIcone mini={mini} href={links.twitter} title="X profile">
           <IconX size={s - 2} />
         </LinkIcone>
       )}
@@ -331,10 +331,10 @@ export function LinksExternos({
       )}
       {!temReal && fallback && (
         <>
-          <LinkIcone mini={mini} href={`https://www.google.com/search?q=${q}`} title="Buscar no Google">
+          <LinkIcone mini={mini} href={`https://www.google.com/search?q=${q}`} title="Search on Google">
             <IconBusca size={s - 1} />
           </LinkIcone>
-          <LinkIcone mini={mini} href={`https://x.com/search?q=${q}`} title="Buscar no X">
+          <LinkIcone mini={mini} href={`https://x.com/search?q=${q}`} title="Search on X">
             <IconX size={s - 2} />
           </LinkIcone>
         </>

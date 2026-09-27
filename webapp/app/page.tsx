@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { getFeedFatos, getSetores, getStats, getUltimos7Dias, listInstituicoes, type InstComLinks, type InstComRating } from "@/lib/db";
-import { Avatar, HexIcon, NotaBadge, Painel, ScoreChip, TagChip, limparDescricao, segCurto } from "@/components/ui";
+import { getFeedFatos, getSetores, getStats, getUltimos7Dias, listInstituicoes } from "@/lib/db";
+import { Avatar, NotaBadge, Painel, ScoreChip, limparDescricao, segCurto } from "@/components/ui";
 import { TipoBadge } from "@/components/timeline";
 import Tabela from "./tabela";
+import Destaques from "./destaques";
 
 function fmtFeedData(d: string) {
   // "YYYY-MM-DD HH:MM:SS" → "MM-DD HH:MM"
@@ -12,72 +13,11 @@ function fmtFeedData(d: string) {
 }
 
 const TIPO_FEED: Record<string, string> = {
-  noticia: "Notícia",
-  site: "Site",
-  associacao: "Associação",
-  evento: "Evento",
+  noticia: "News",
+  site: "Website",
+  associacao: "Association",
+  evento: "Event",
 };
-
-function TrendingCard({ r }: { r: InstComLinks }) {
-  const nome = r.nome_fantasia || r.razao_social;
-  return (
-    <Link
-      href={`/inst/${r.cnpj}`}
-      className="rounded-xl border border-edge bg-ink-900 p-3.5 transition-colors hover:border-certik/40 hover:bg-ink-800"
-    >
-      <div className="flex items-start gap-2.5">
-        <Avatar nome={nome} size={34} />
-        <div className="min-w-0">
-          <div className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-tight text-white" title={r.razao_social}>
-            {nome}
-          </div>
-          <div className="truncate text-[11px] text-slate-500" title={r.segmento}>
-            {segCurto(r.segmento)}
-          </div>
-        </div>
-      </div>
-      <div className="mt-3 flex items-center gap-1.5">
-        <ScoreChip score={r.rating} />
-        <HexIcon score={r.rating} />
-        <NotaBadge nota={r.nota} />
-      </div>
-      {r.tags.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {r.tags.slice(0, 2).map((t) => (
-            <TagChip key={t} tag={t} mini />
-          ))}
-        </div>
-      )}
-    </Link>
-  );
-}
-
-function Ranking({ titulo, itens }: { titulo: string; itens: InstComRating[] }) {
-  return (
-    <Painel titulo={titulo}>
-      <ul className="divide-y divide-edge/60">
-        {itens.map((r, i) => (
-          <li key={r.cnpj}>
-            <Link href={`/inst/${r.cnpj}`} className="flex items-center gap-2.5 px-4 py-2.5 transition-colors hover:bg-ink-800">
-              <span className="inline-flex min-w-[26px] justify-center rounded bg-ink-700 px-1 py-0.5 text-[11px] text-slate-500">
-                {i + 1}
-              </span>
-              <Avatar nome={r.nome_fantasia || r.razao_social} size={26} />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-200" title={r.razao_social}>
-                {r.nome_fantasia || r.razao_social}
-              </span>
-              <ScoreChip score={r.rating} />
-              <span className="hidden lg:inline-flex">
-                <HexIcon score={r.rating} />
-              </span>
-              <NotaBadge nota={r.nota} />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </Painel>
-  );
-}
 
 export default function Home() {
   const stats = getStats();
@@ -86,52 +26,33 @@ export default function Home() {
   const feed = getFeedFatos(25);
   const ultimos7 = getUltimos7Dias(12);
 
-  const destaque = rows.slice(0, 8);
-  const topSpsav = rows.filter((r) => r.origem === "SPSAV").slice(0, 5);
-  const topInc = rows.filter((r) => r.origem === "INCUMBENTE").slice(0, 5);
-  const sinalizadas = rows.filter((r) => r.origem === "INCUMBENTE" && r.score > 0).slice(0, 5);
-
   const mediaGeral = setores.reduce((s, x) => s + x.media * x.n, 0) / Math.max(1, setores.reduce((s, x) => s + x.n, 0));
 
   const miniStats = [
     { label: "SPSAVs", value: stats.spsav, accent: "text-certik" },
-    { label: "Incumbentes elegíveis", value: stats.incumbentes, accent: "text-sky-400" },
-    { label: "Incumbentes com sinal", value: stats.comSinal, accent: "text-amber-400" },
-    { label: "Mês de referência", value: stats.mesRef, accent: "text-slate-300" },
+    { label: "Eligible incumbents", value: stats.incumbentes, accent: "text-sky-400" },
+    { label: "Incumbents with signal", value: stats.comSinal, accent: "text-amber-400" },
+    { label: "Reference month", value: stats.mesRef, accent: "text-slate-300" },
   ];
 
   return (
     <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
       <div className="min-w-0 space-y-5">
-        <section>
-          <div className="mb-3 flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-white">Instituições em destaque</h2>
-            <span className="text-slate-600">›</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {destaque.map((r) => (
-              <TrendingCard key={r.cnpj} r={r} />
-            ))}
-          </div>
-        </section>
-
-        <div className="grid gap-3 lg:grid-cols-3">
-          <Ranking titulo="Top SPSAVs" itens={topSpsav} />
-          <Ranking titulo="Top Incumbentes" itens={topInc} />
-          <Ranking titulo="Incumbentes sinalizadas" itens={sinalizadas} />
-        </div>
+        <Suspense>
+          <Destaques rows={rows} />
+        </Suspense>
 
         {ultimos7.length > 0 && (
           <Painel
             titulo={
               <span className="flex items-center gap-2">
-                Últimos 7 dias
+                Last 7 days
                 <span className="rounded-full bg-certik/15 px-2 py-0.5 text-[10px] font-semibold text-certik">
-                  {ultimos7.length} fatos
+                  {ultimos7.length} facts
                 </span>
               </span>
             }
-            acao={<span className="text-[11px] text-slate-500">Monitoramento contínuo</span>}
+            acao={<span className="text-[11px] text-slate-500">Continuous monitoring</span>}
           >
             <ul className="divide-y divide-edge/60">
               {ultimos7.map((f, i) => (
@@ -189,7 +110,7 @@ export default function Home() {
       </div>
 
       <div className="hidden space-y-5 xl:block">
-        <Painel titulo="Segmentos" acao={<span className="rounded border border-edge bg-ink-800 px-2 py-0.5 text-[10px] text-slate-500">Rating médio</span>}>
+        <Painel titulo="Segments" acao={<span className="rounded border border-edge bg-ink-800 px-2 py-0.5 text-[10px] text-slate-500">Avg rating</span>}>
           <div className="grid grid-cols-2 gap-2 p-3">
             {setores.slice(0, 10).map((s) => {
               const acima = s.media >= mediaGeral;
@@ -212,13 +133,13 @@ export default function Home() {
         <Painel
           titulo={
             <span className="flex items-center gap-2">
-              Feed OSINT
+              OSINT Feed
               <span className="rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-semibold text-rose-400">
                 ((•)) {feed.length}
               </span>
             </span>
           }
-          acao={<span className="text-[11px] text-slate-500">Mais recentes</span>}
+          acao={<span className="text-[11px] text-slate-500">Latest</span>}
         >
           <ol className="relative m-4 space-y-5 border-l border-dashed border-rose-500/30 pl-4">
             {feed.map((f, i) => {

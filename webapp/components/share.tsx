@@ -7,13 +7,13 @@ export default function Share() {
   return (
     <span className="inline-flex items-center gap-1.5">
       <button
-        title="Favoritar"
+        title="Favorite"
         className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-edge bg-ink-800 text-slate-500 transition-colors hover:border-amber-500/40 hover:text-amber-300"
       >
         ☆
       </button>
       <button
-        title="Copiar link"
+        title="Copy link"
         onClick={() => {
           navigator.clipboard?.writeText(window.location.href);
           setCopiado(true);
@@ -21,7 +21,7 @@ export default function Share() {
         }}
         className="inline-flex h-7 items-center justify-center gap-1 rounded-lg border border-edge bg-ink-800 px-2 text-xs text-slate-500 transition-colors hover:border-certik/40 hover:text-certik"
       >
-        {copiado ? "✓ copiado" : "⤴ compartilhar"}
+        {copiado ? "✓ copied" : "⤴ share"}
       </button>
     </span>
   );
