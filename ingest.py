@@ -68,6 +68,12 @@ CREATE TABLE IF NOT EXISTS itens_instituicao (
 );
 CREATE INDEX IF NOT EXISTS idx_itens_proc ON itens_brutos(processado);
 CREATE INDEX IF NOT EXISTS idx_itens_inst_cnpj ON itens_instituicao(cnpj);
+CREATE TABLE IF NOT EXISTS site_snapshots (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cnpj TEXT, url TEXT, hash TEXT, texto TEXT,
+    coletado_em TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_snap_site ON site_snapshots(cnpj, url);
 CREATE TABLE IF NOT EXISTS monitor_config (
     cnpj TEXT PRIMARY KEY,
     ativo INTEGER DEFAULT 0,       -- 1 = monitoramento contínuo ligado
