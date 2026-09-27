@@ -1,0 +1,30 @@
+# Termos de ativos digitais usados pelo coletor de vagas (coletor_vagas.py).
+# Formato: lista simples "- termo" (uma por linha). Matching sem acento/caixa;
+# termos curtos exigem palavra exata. Adicione/remova à vontade.
+- cripto
+- crypto
+- criptoativo
+- criptomoeda
+- bitcoin
+- ethereum
+- blockchain
+- tokenizacao
+- tokenização
+- token
+- ativos digitais
+- ativos virtuais
+- digital assets
+- custodia digital
+- custódia digital
+- drex
+- cbdc
+- stablecoin
+- web3
+- defi
+- exchange
+- vasp
+- psav
+- smart contract
+- contrato inteligente
+- onchain
+- on-chain
