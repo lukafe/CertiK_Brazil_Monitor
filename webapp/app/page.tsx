@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { getFeedFatos, getSetores, getStats, listInstituicoes, type InstComLinks, type InstComRating } from "@/lib/db";
+import { getFeedFatos, getSetores, getStats, getUltimos7Dias, listInstituicoes, type InstComLinks, type InstComRating } from "@/lib/db";
 import { Avatar, HexIcon, NotaBadge, Painel, ScoreChip, TagChip, limparDescricao, segCurto } from "@/components/ui";
+import { TipoBadge } from "@/components/timeline";
 import Tabela from "./tabela";
 
 function fmtFeedData(d: string) {
@@ -83,6 +84,7 @@ export default function Home() {
   const rows = listInstituicoes();
   const setores = getSetores();
   const feed = getFeedFatos(25);
+  const ultimos7 = getUltimos7Dias(12);
 
   const destaque = rows.slice(0, 8);
   const topSpsav = rows.filter((r) => r.origem === "SPSAV").slice(0, 5);
@@ -118,6 +120,55 @@ export default function Home() {
           <Ranking titulo="Top Incumbentes" itens={topInc} />
           <Ranking titulo="Incumbentes sinalizadas" itens={sinalizadas} />
         </div>
+
+        {ultimos7.length > 0 && (
+          <Painel
+            titulo={
+              <span className="flex items-center gap-2">
+                Últimos 7 dias
+                <span className="rounded-full bg-certik/15 px-2 py-0.5 text-[10px] font-semibold text-certik">
+                  {ultimos7.length} fatos
+                </span>
+              </span>
+            }
+            acao={<span className="text-[11px] text-slate-500">Monitoramento contínuo</span>}
+          >
+            <ul className="divide-y divide-edge/60">
+              {ultimos7.map((f, i) => (
+                <li key={i} className="flex items-start gap-3 px-4 py-2.5">
+                  <span className="mt-0.5 shrink-0 font-mono text-[10px] text-rose-400/80">
+                    {fmtFeedData(f.criado_em).dia}
+                  </span>
+                  <span className="shrink-0">
+                    <TipoBadge tipo={f.tipo} />
+                  </span>
+                  <span className="min-w-0 flex-1 text-xs leading-relaxed text-slate-300">
+                    <span className="line-clamp-2">{limparDescricao(f.descricao)}</span>
+                    {f.url && (
+                      <a
+                        href={f.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] text-slate-600 hover:text-certik"
+                      >
+                        link ↗
+                      </a>
+                    )}
+                  </span>
+                  <Link
+                    href={`/inst/${f.cnpj}`}
+                    title={f.razao_social}
+                    className="flex shrink-0 items-center gap-1.5 text-[11px] font-medium text-slate-400 hover:text-certik"
+                  >
+                    <Avatar nome={f.nome_fantasia || f.razao_social} size={18} />
+                    <span className="hidden max-w-[130px] truncate md:inline">{f.nome_fantasia || f.razao_social}</span>
+                    <NotaBadge nota={f.nota} />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Painel>
+        )}
 
         <section className="space-y-3">
           <div className="flex flex-wrap items-center gap-4">

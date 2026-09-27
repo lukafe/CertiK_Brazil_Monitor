@@ -258,8 +258,25 @@ export function getFeedFatos(limit = 30): FeedItem[] {
        FROM fatos f
        JOIN instituicoes i ON i.cnpj = f.cnpj
        LEFT JOIN ratings r ON r.cnpj = i.cnpj AND r.mes_ref = i.mes_ref
-       WHERE f.tipo IN ('noticia', 'site', 'associacao', 'evento')
+       WHERE f.tipo IN ('noticia', 'site', 'associacao', 'evento', 'vaga')
        ORDER BY f.criado_em DESC, f.rowid DESC
+       LIMIT ?`
+    )
+    .all(limit) as FeedItem[];
+}
+
+/** Fatos do monitoramento contínuo dos últimos 7 dias (bloco da home). */
+export function getUltimos7Dias(limit = 12): FeedItem[] {
+  return db()
+    .prepare(
+      `SELECT f.criado_em, f.tipo, f.descricao, f.url, f.fonte, i.cnpj, i.razao_social, i.nome_fantasia,
+              COALESCE(r.nota, 'D') nota, COALESCE(r.rating, 0) rating
+       FROM fatos f
+       JOIN instituicoes i ON i.cnpj = f.cnpj
+       LEFT JOIN ratings r ON r.cnpj = i.cnpj AND r.mes_ref = i.mes_ref
+       WHERE f.tipo IN ('noticia', 'site', 'vaga', 'pessoa')
+         AND COALESCE(f.data, substr(f.criado_em, 1, 10)) >= date('now', '-7 day')
+       ORDER BY COALESCE(f.data, substr(f.criado_em, 1, 10)) DESC, f.rowid DESC
        LIMIT ?`
     )
     .all(limit) as FeedItem[];

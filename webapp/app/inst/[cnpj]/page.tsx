@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEnriquecimento, getEventos, getFatos, getGrupoMembros, getInstituicao, getSnapshots, getTodosCnpjs, montarLinks } from "@/lib/db";
-import { Avatar, LinksExternos, NotaBadge, OrigemChip, Painel, TagChip, ViaChip, limparDescricao, segCurto } from "@/components/ui";
+import { Avatar, LinksExternos, NotaBadge, OrigemChip, Painel, TagChip, ViaChip, segCurto } from "@/components/ui";
 import Radar from "@/components/radar";
 import Sparkline from "@/components/sparkline";
 import Share from "@/components/share";
+import Timeline from "@/components/timeline";
 
 export const dynamicParams = false;
 
@@ -82,15 +83,6 @@ function SinalLinha({ nome, on, evidencia }: { nome: string; on: boolean | null;
     </div>
   );
 }
-
-const TIPO_FATO: Record<string, string> = {
-  associacao: "🤝 Associação",
-  evento: "🎤 Evento",
-  noticia: "📰 Notícia",
-  site: "🌐 Site",
-  pessoa: "👤 Pessoa-chave",
-  manual: "✍️ Curadoria",
-};
 
 const TABS: [string, string][] = [
   ["#visao", "Pulse Feed"],
@@ -173,32 +165,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
           }
         >
           {fatos.length ? (
-            <ol className="relative m-4 space-y-5 border-l border-dashed border-rose-500/30 pl-4">
-              {fatos.map((f, i) => (
-                <li key={i} className="relative">
-                  <span className="absolute -left-[21.5px] top-1.5 h-2 w-2 rounded-full bg-rose-500/70" />
-                  <div className="flex flex-wrap items-baseline gap-2 text-[10px] text-slate-500">
-                    <span className="font-mono text-rose-400/80">{f.criado_em?.slice(0, 16)}</span>
-                    <span className="uppercase tracking-wide">{TIPO_FATO[f.tipo] ?? f.tipo}</span>
-                    {f.fonte && <span>fonte: {f.fonte}</span>}
-                    <span>confiança {(f.confianca * 100).toFixed(0)}%</span>
-                  </div>
-                  <div className="mt-0.5 text-sm leading-relaxed text-slate-300">
-                    {limparDescricao(f.descricao)}
-                    {f.url && (
-                      <a
-                        href={f.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-2 text-certik/80 hover:text-certik"
-                      >
-                        link ↗
-                      </a>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <Timeline fatos={fatos} />
           ) : (
             <p className="p-4 text-sm text-slate-500">Nenhum fato coletado ainda para esta instituição.</p>
           )}
