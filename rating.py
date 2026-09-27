@@ -77,6 +77,36 @@ def idade_anos(data_inicio: str | None) -> float:
         return 0.0
 
 
+JANELA_DIAS = 90  # fatos do monitoramento contínuo valem por 90 dias, com decaimento
+
+
+def fatos_recentes(con: sqlite3.Connection) -> dict[str, dict[str, float]]:
+    """Peso decadente (confianca × idade) dos fatos do monitoramento contínuo
+    dos últimos 90 dias, por cnpj: noticia/site → atividade; descricao
+    '[parceria]' → ecossistema; pessoa/vaga → pessoas."""
+    hoje = date.today()
+    rec: dict[str, dict[str, float]] = {}
+    for r in con.execute(
+            """SELECT cnpj, tipo, descricao, COALESCE(confianca, 0.6) confianca,
+                      COALESCE(data, substr(criado_em, 1, 10)) d
+               FROM fatos WHERE tipo IN ('noticia', 'site', 'pessoa', 'vaga')"""):
+        try:
+            idade = (hoje - date.fromisoformat(r["d"])).days
+        except (ValueError, TypeError):
+            continue
+        if not 0 <= idade <= JANELA_DIAS:
+            continue
+        peso = r["confianca"] * (1 - idade / JANELA_DIAS)  # decaimento linear
+        b = rec.setdefault(r["cnpj"], {"atividade": 0.0, "parceria": 0.0, "pessoas": 0.0})
+        if r["tipo"] in ("noticia", "site"):
+            b["atividade"] += peso
+            if (r["descricao"] or "").startswith("[parceria]"):
+                b["parceria"] += peso
+        else:  # pessoa | vaga
+            b["pessoas"] += peso
+    return rec
+
+
 def capital_score(capital: str | None) -> float:
     """Escala log: R$100k→25, R$1M→50, R$10M→75, R$100M+→100."""
     try:
@@ -101,8 +131,11 @@ def main():
     for r in con.execute("SELECT cnpj, tipo, COUNT(*) n FROM fatos GROUP BY cnpj, tipo"):
         fatos.setdefault(r["cnpj"], {})[r["tipo"]] = r["n"]
 
+    recentes = fatos_recentes(con)
+
     for i in insts:
         f = fatos.get(i["cnpj"], {})
+        rec = recentes.get(i["cnpj"], {"atividade": 0.0, "parceria": 0.0, "pessoas": 0.0})
         spsav = i["origem"] == "SPSAV"
 
         # 1) Regulatório (30%) — SPSAV mudou razão social = aplicando; incumbente elegível parte de base
@@ -119,12 +152,13 @@ def main():
         ativ = 0.0
         ativ += 55.0 if i["sinal_noticias"] == 1 else 0
         ativ += 35.0 if i["sinal_site"] == 1 else 0
-        ativ += min(10.0, 5.0 * f.get("noticia", 0) + 5.0 * f.get("site", 0))
+        ativ += min(15.0, 8.0 * rec["atividade"])  # fatos noticia/site (90 dias, decaimento)
         if spsav and ativ == 0:
             ativ = 30.0  # constituir/renomear a empresa já é atividade pública
 
         # 3) Ecossistema (20%) — associações e eventos (fatos dos coletores)
-        eco = clamp(30.0 * f.get("associacao", 0) + 20.0 * f.get("evento", 0))
+        eco = clamp(30.0 * f.get("associacao", 0) + 20.0 * f.get("evento", 0)
+                    + min(20.0, 15.0 * rec["parceria"]))  # parcerias noticiadas (90 dias)
 
         # 4) Pessoas (15%) — sócios em comum com SPSAV, grupo econômico, quadro societário
         pes = 0.0
@@ -132,7 +166,7 @@ def main():
         pes += 30.0 if i["sinal_grupo_spsav"] == 1 and not i["socio_comum"] else 0
         n_socios = len((i["socios"] or "").split(" | ")) if i["socios"] else 0
         pes += min(20.0, n_socios * 5.0)                 # quadro societário identificado
-        pes += min(20.0, 20.0 * f.get("pessoa", 0))      # decisores mapeados (coletor futuro)
+        pes += min(20.0, 12.0 * rec["pessoas"])          # executivos/vagas (90 dias, decaimento)
         pes = clamp(pes)
 
         # 5) Solidez (10%) — capital social (70%), idade (20%), situação (10%)
