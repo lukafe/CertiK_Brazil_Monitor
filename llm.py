@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import json
 import os
+import sqlite3
 import time
+from pathlib import Path
 
 from dotenv import load_dotenv
 from google import genai
@@ -19,6 +21,27 @@ load_dotenv()
 
 FLASH = "gemini-2.5-flash"
 PRO = "gemini-2.5-pro"
+
+_DB_USO = Path(__file__).parent / "data" / "monitor.db"
+
+
+def _registrar_uso(modelo: str, usage) -> None:
+    """Grava tokens da chamada em `gemini_uso` (para o resumo de custo do
+    run_monitor). Nunca propaga erro — telemetria não pode quebrar o pipeline."""
+    try:
+        entrada = getattr(usage, "prompt_token_count", 0) or 0
+        saida = (getattr(usage, "candidates_token_count", 0) or 0) + \
+                (getattr(usage, "thoughts_token_count", 0) or 0)
+        con = sqlite3.connect(_DB_USO, timeout=30)
+        con.execute("""CREATE TABLE IF NOT EXISTS gemini_uso (
+                           ts TEXT DEFAULT (datetime('now')),
+                           modelo TEXT, tokens_entrada INTEGER, tokens_saida INTEGER)""")
+        con.execute("INSERT INTO gemini_uso (modelo, tokens_entrada, tokens_saida) VALUES (?,?,?)",
+                    (modelo, entrada, saida))
+        con.commit()
+        con.close()
+    except Exception:
+        pass
 
 _cliente: genai.Client | None = None
 
@@ -50,6 +73,7 @@ def gemini_json(prompt: str, schema: dict, modelo: str = FLASH,
                     response_schema=schema,
                 ),
             )
+            _registrar_uso(modelo, resp.usage_metadata)
             return json.loads(resp.text)
         except Exception as e:  # rede/quota/JSON truncado — retry com backoff
             if i == tentativas - 1:

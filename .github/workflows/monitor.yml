@@ -1,0 +1,50 @@
+# Monitoramento contínuo — roda o ciclo completo a cada 4 horas e commita
+# o data/monitor.db atualizado (o push dispara o deploy do webapp na Vercel).
+#
+# Requer o secret GEMINI_API_KEY (Settings → Secrets and variables → Actions).
+name: monitor
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  ciclo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install feedparser trafilatura rapidfuzz httpx google-genai python-dotenv
+
+      - name: Rodar ciclo de monitoramento
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python run_monitor.py
+        continue-on-error: true  # falha parcial não impede o commit do que foi coletado
+
+      - name: Commitar banco atualizado
+        run: |
+          git config user.name "monitor-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/monitor.db
+          if git diff --cached --quiet; then
+            echo "sem mudanças no banco — nada a commitar"
+          else
+            git commit -m "monitor: ciclo automático $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git pull --rebase origin main
+            git push
+          fi
