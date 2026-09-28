@@ -236,12 +236,12 @@ export function getAlvosCustodia(): AlvoCustodia[] {
               MAX(v.modelo) verif_modelo, MAX(v.custodiante) verif_custodiante,
               MAX(v.justificativa) verif_justificativa, MAX(v.evidencia_url) verif_url,
               MAX(v.confianca) verif_confianca
-       FROM tags t
-       JOIN instituicoes i ON i.cnpj = t.cnpj
+       FROM instituicoes i
+       LEFT JOIN tags t ON t.cnpj = i.cnpj AND t.tag IN ('custodia_propria', 'custodia_terceirizada')
        LEFT JOIN ratings r ON r.cnpj = i.cnpj AND r.mes_ref = i.mes_ref
        LEFT JOIN enriquecimento e ON e.cnpj = i.cnpj
        LEFT JOIN custodia_verificacao v ON v.cnpj = i.cnpj
-       WHERE t.tag IN ('custodia_propria', 'custodia_terceirizada')
+       WHERE t.tag IS NOT NULL OR v.cnpj IS NOT NULL
        GROUP BY i.cnpj
        ORDER BY r.rating DESC, i.razao_social ASC`
     )

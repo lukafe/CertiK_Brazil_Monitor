@@ -120,8 +120,14 @@ def main():
 
     insts = [dict(r) for r in con.execute(
         """SELECT DISTINCT i.cnpj, i.razao_social, i.nome_fantasia
-           FROM tags t JOIN instituicoes i ON i.cnpj = t.cnpj
-           WHERE t.tag IN ('custodia_propria', 'custodia_terceirizada')
+           FROM instituicoes i
+           WHERE i.cnpj IN (
+             SELECT cnpj FROM tags WHERE tag IN ('custodia_propria', 'custodia_terceirizada')
+             UNION
+             -- Tier 3: menção de custódia em fato OSINT (site/notícia) sem tag
+             SELECT cnpj FROM fatos
+             WHERE lower(descricao) LIKE '%custod%' OR lower(descricao) LIKE '%custód%'
+           )
            ORDER BY i.cnpj""")]
 
     feitos = set() if args.force else {
