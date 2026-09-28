@@ -186,6 +186,60 @@ export function listInstituicoes(): InstComLinks[] {
   });
 }
 
+export type AlvoCustodia = {
+  cnpj: string;
+  razao_social: string;
+  nome_fantasia: string | null;
+  segmento: string;
+  origem: string;
+  situacao: string | null;
+  rating: number;
+  nota: string;
+  tags_custodia: string[];
+  confianca: number | null;
+  descricao: string | null;
+  evidencia_fato: string | null;
+  evidencia_fonte: string | null;
+  evidencia_url: string | null;
+  site: string | null;
+};
+
+/** Alvos de auditoria de custódia (Res. BCB 520, art. 73): PSAVs com tag de custódia própria/terceirizada. */
+export function getAlvosCustodia(): AlvoCustodia[] {
+  const rows = db()
+    .prepare(
+      `SELECT i.cnpj, i.razao_social, i.nome_fantasia, i.segmento, i.origem, i.situacao,
+              COALESCE(r.rating, 0) rating, COALESCE(r.nota, 'D') nota,
+              GROUP_CONCAT(DISTINCT t.tag) tags_csv,
+              MAX(e.confianca) confianca, MAX(e.descricao) descricao,
+              (SELECT f.descricao FROM fatos f
+                WHERE f.cnpj = i.cnpj AND (lower(f.descricao) LIKE '%custod%' OR lower(f.descricao) LIKE '%custód%')
+                ORDER BY (f.url IS NOT NULL AND f.url NOT LIKE '%vertexaisearch%') DESC, f.confianca DESC
+                LIMIT 1) evidencia_fato,
+              (SELECT f.fonte FROM fatos f
+                WHERE f.cnpj = i.cnpj AND (lower(f.descricao) LIKE '%custod%' OR lower(f.descricao) LIKE '%custód%')
+                ORDER BY (f.url IS NOT NULL AND f.url NOT LIKE '%vertexaisearch%') DESC, f.confianca DESC
+                LIMIT 1) evidencia_fonte,
+              (SELECT f.url FROM fatos f
+                WHERE f.cnpj = i.cnpj AND (lower(f.descricao) LIKE '%custod%' OR lower(f.descricao) LIKE '%custód%')
+                  AND f.url IS NOT NULL AND f.url NOT LIKE '%vertexaisearch%'
+                ORDER BY f.confianca DESC LIMIT 1) evidencia_url,
+              MAX(e.site) site
+       FROM tags t
+       JOIN instituicoes i ON i.cnpj = t.cnpj
+       LEFT JOIN ratings r ON r.cnpj = i.cnpj AND r.mes_ref = i.mes_ref
+       LEFT JOIN enriquecimento e ON e.cnpj = i.cnpj
+       WHERE t.tag IN ('custodia_propria', 'custodia_terceirizada')
+       GROUP BY i.cnpj
+       ORDER BY (GROUP_CONCAT(DISTINCT t.tag) LIKE '%propria%') DESC, r.rating DESC, i.razao_social ASC`
+    )
+    .all() as (Omit<AlvoCustodia, "tags_custodia"> & { tags_csv: string | null })[];
+  return rows.map((r) => {
+    const { tags_csv, ...resto } = r;
+    return { ...resto, tags_custodia: (tags_csv ?? "").split(",").filter(Boolean) };
+  });
+}
+
 export function getTodosCnpjs(): string[] {
   return (db().prepare("SELECT cnpj FROM instituicoes").all() as { cnpj: string }[]).map((r) => r.cnpj);
 }

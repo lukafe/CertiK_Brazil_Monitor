@@ -38,6 +38,18 @@ const ITENS = [
     ),
   },
   {
+    href: "/custodia",
+    chave: "custodia",
+    label: "Custody Audit",
+    icone: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="4" y="10" width="16" height="10" rx="2" />
+        <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+        <circle cx="12" cy="15" r="1.5" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
     href: "/?grupos=1",
     chave: "grupos",
     label: "Groups",
@@ -64,12 +76,14 @@ function Nav() {
       </div>
       {ITENS.map((it) => {
         const ativo =
-          pathname === "/" &&
-          (it.chave === ""
-            ? !origem && !grupos
-            : it.chave === "grupos"
-            ? grupos === "1"
-            : origem === it.chave);
+          it.chave === "custodia"
+            ? pathname === "/custodia"
+            : pathname === "/" &&
+              (it.chave === ""
+                ? !origem && !grupos
+                : it.chave === "grupos"
+                ? grupos === "1"
+                : origem === it.chave);
         return (
           <Link
             key={it.label}
