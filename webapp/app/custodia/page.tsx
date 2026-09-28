@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getAlvosCustodia, type AlvoCustodia } from "@/lib/db";
+import { getAlvosCustodia, type AlvoCustodia, type ModeloCustodia } from "@/lib/db";
 import { Avatar, NotaBadge, Painel, ScoreChip, limparDescricao, segCurto } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -12,21 +12,17 @@ function nomeInst(a: AlvoCustodia) {
   return a.nome_fantasia?.trim() || a.razao_social;
 }
 
-function CustodyChips({ tags }: { tags: string[] }) {
-  return (
-    <span className="flex flex-wrap gap-1">
-      {tags.includes("custodia_propria") && (
-        <span className="rounded bg-certik/15 px-1.5 py-0.5 text-[10px] font-semibold text-certik">
-          Self-custody
-        </span>
-      )}
-      {tags.includes("custodia_terceirizada") && (
-        <span className="rounded bg-sky-400/15 px-1.5 py-0.5 text-[10px] font-semibold text-sky-400">
-          Third-party
-        </span>
-      )}
-    </span>
-  );
+const MODELO_CHIP: Record<string, { label: string; cls: string }> = {
+  propria: { label: "Self-custody · verified", cls: "bg-certik/15 text-certik" },
+  terceirizada: { label: "Third-party · verified", cls: "bg-sky-400/15 text-sky-400" },
+  hibrida: { label: "Hybrid · verified", cls: "bg-violet-400/15 text-violet-400" },
+  indeterminado: { label: "Model unverified", cls: "bg-amber-400/15 text-amber-400" },
+  sem_custodia: { label: "No custody found", cls: "bg-slate-500/15 text-slate-400" },
+};
+
+function ModeloChip({ modelo }: { modelo: ModeloCustodia | null }) {
+  const m = MODELO_CHIP[modelo ?? "indeterminado"] ?? MODELO_CHIP.indeterminado;
+  return <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${m.cls}`}>{m.label}</span>;
 }
 
 function TabelaAlvos({ alvos }: { alvos: AlvoCustodia[] }) {
@@ -38,13 +34,14 @@ function TabelaAlvos({ alvos }: { alvos: AlvoCustodia[] }) {
             <th className="px-4 py-2.5">#</th>
             <th className="px-4 py-2.5">Institution</th>
             <th className="px-4 py-2.5">Rating</th>
-            <th className="px-4 py-2.5">Custody</th>
-            <th className="px-4 py-2.5">Evidence</th>
+            <th className="px-4 py-2.5">Custody model</th>
+            <th className="px-4 py-2.5">Evidence / rationale</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-edge/60">
           {alvos.map((a, i) => {
-            const evid = limparDescricao(a.evidencia_fato) || limparDescricao(a.descricao);
+            const evid =
+              limparDescricao(a.verif_justificativa) || limparDescricao(a.evidencia_fato) || limparDescricao(a.descricao);
             return (
               <tr key={a.cnpj} className="align-top hover:bg-ink-800/50">
                 <td className="px-4 py-3 font-mono text-[10px] text-slate-600">{i + 1}</td>
@@ -66,20 +63,27 @@ function TabelaAlvos({ alvos }: { alvos: AlvoCustodia[] }) {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <CustodyChips tags={a.tags_custodia} />
+                  <span className="flex flex-col items-start gap-1">
+                    <ModeloChip modelo={a.verif_modelo} />
+                    {a.verif_custodiante && (
+                      <span className="text-[10px] text-slate-500">via {a.verif_custodiante}</span>
+                    )}
+                    {a.verif_confianca != null && (
+                      <span className="text-[10px] text-slate-600">confidence {Math.round(a.verif_confianca * 100)}%</span>
+                    )}
+                  </span>
                 </td>
                 <td className="max-w-[420px] px-4 py-3 text-slate-400">
-                  <span className="line-clamp-3">{evid || "Tagged via Gemini enrichment (Google Search grounding)"}</span>
+                  <span className="line-clamp-3">{evid || "Custody declared via Gemini enrichment — no independent evidence yet"}</span>
                   <span className="mt-1 flex items-center gap-2 text-[10px] text-slate-600">
-                    {a.evidencia_fonte && <span>source: {a.evidencia_fonte}</span>}
-                    {a.evidencia_url && (
+                    {(a.verif_url || a.evidencia_url) && (
                       <a
-                        href={a.evidencia_url}
+                        href={a.verif_url ?? a.evidencia_url ?? "#"}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-slate-500 hover:text-certik"
                       >
-                        link ↗
+                        source ↗
                       </a>
                     )}
                     {a.site && (
@@ -100,19 +104,22 @@ function TabelaAlvos({ alvos }: { alvos: AlvoCustodia[] }) {
 
 export default function CustodiaPage() {
   const alvos = getAlvosCustodia();
-  const propria = alvos.filter((a) => a.tags_custodia.includes("custodia_propria"));
-  const terceirizada = alvos.filter(
-    (a) => a.tags_custodia.includes("custodia_terceirizada") && !a.tags_custodia.includes("custodia_propria")
-  );
+  const porModelo = (m: ModeloCustodia | null) => alvos.filter((a) => (a.verif_modelo ?? "indeterminado") === (m ?? "indeterminado"));
+  const propria = porModelo("propria");
+  const terceirizada = [...porModelo("terceirizada"), ...porModelo("hibrida")];
+  const indeterminado = alvos.filter((a) => !a.verif_modelo || a.verif_modelo === "indeterminado");
+  const semCustodia = porModelo("sem_custodia");
 
   return (
     <div className="space-y-5">
       <Painel titulo="Custody Audit — Res. BCB 520, art. 73">
         <div className="space-y-3 px-4 py-4 text-xs leading-relaxed text-slate-400">
           <p>
-            Target list of PSAVs that fall under the <span className="text-slate-200">independent custody audit</span>{" "}
-            requirement. Evidence column shows what placed each company on the list (news, website snapshot or
-            Gemini-grounded enrichment).
+            PSAVs in scope for the <span className="text-slate-200">independent custody audit</span> requirement. All
+            companies below <span className="text-slate-200">declare offering custody</span> of virtual assets. The
+            custody <em>model</em> (who actually controls the keys) was verified in a second, dedicated web-research
+            pass that requires citable evidence and allows &quot;indeterminate&quot; — because marketing copy saying
+            &quot;we offer custody&quot; does not prove self-custody.
           </p>
           <ul className="list-disc space-y-1 pl-5">
             <li>
@@ -134,35 +141,70 @@ export default function CustodiaPage() {
         </div>
       </Painel>
 
-      <Painel
-        titulo={
-          <span className="flex items-center gap-2">
-            Tier 1 — Self-custody
-            <span className="rounded-full bg-certik/15 px-2 py-0.5 text-[10px] font-semibold text-certik">
-              {propria.length} companies · direct annual audit obligation
+      {propria.length > 0 && (
+        <Painel
+          titulo={
+            <span className="flex items-center gap-2">
+              Self-custody — verified
+              <span className="rounded-full bg-certik/15 px-2 py-0.5 text-[10px] font-semibold text-certik">
+                {propria.length} companies · direct annual audit obligation (art. 73 §§ 4º–5º)
+              </span>
             </span>
-          </span>
-        }
-      >
-        <TabelaAlvos alvos={propria} />
-      </Painel>
+          }
+        >
+          <TabelaAlvos alvos={propria} />
+        </Painel>
+      )}
 
-      <Painel
-        titulo={
-          <span className="flex items-center gap-2">
-            Tier 2 — Third-party custody
-            <span className="rounded-full bg-sky-400/15 px-2 py-0.5 text-[10px] font-semibold text-sky-400">
-              {terceirizada.length} companies · must evaluate the custodian&apos;s audit
+      {terceirizada.length > 0 && (
+        <Painel
+          titulo={
+            <span className="flex items-center gap-2">
+              Third-party / hybrid custody — verified
+              <span className="rounded-full bg-sky-400/15 px-2 py-0.5 text-[10px] font-semibold text-sky-400">
+                {terceirizada.length} companies · must evaluate the custodian&apos;s audit (arts. 74–75)
+              </span>
             </span>
-          </span>
-        }
-      >
-        <TabelaAlvos alvos={terceirizada} />
-      </Painel>
+          }
+        >
+          <TabelaAlvos alvos={terceirizada} />
+        </Painel>
+      )}
+
+      {indeterminado.length > 0 && (
+        <Painel
+          titulo={
+            <span className="flex items-center gap-2">
+              Custody declared — model unverified
+              <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] font-semibold text-amber-400">
+                {indeterminado.length} companies · in scope of art. 73, key management not public
+              </span>
+            </span>
+          }
+        >
+          <TabelaAlvos alvos={indeterminado} />
+        </Painel>
+      )}
+
+      {semCustodia.length > 0 && (
+        <Painel
+          titulo={
+            <span className="flex items-center gap-2">
+              Likely out of scope
+              <span className="rounded-full bg-slate-500/15 px-2 py-0.5 text-[10px] font-semibold text-slate-400">
+                {semCustodia.length} companies · verification found no client-asset custody
+              </span>
+            </span>
+          }
+        >
+          <TabelaAlvos alvos={semCustodia} />
+        </Painel>
+      )}
 
       <p className="px-1 text-[11px] text-slate-600">
-        Generated from monitor.db (Gemini enrichment with Google Search grounding + OSINT facts). Validate manually
-        before outreach — e.g. companies that announced shutdown may still need transition/migration assurance.
+        Sources: Gemini enrichment with Google Search grounding (declared custody) + dedicated custody-model
+        verification pass requiring citable evidence, cross-checked with OSINT facts in monitor.db. Verified labels
+        are still automated research — validate manually before outreach.
       </p>
     </div>
   );

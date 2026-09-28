@@ -186,6 +186,8 @@ export function listInstituicoes(): InstComLinks[] {
   });
 }
 
+export type ModeloCustodia = "propria" | "terceirizada" | "hibrida" | "indeterminado" | "sem_custodia";
+
 export type AlvoCustodia = {
   cnpj: string;
   razao_social: string;
@@ -202,6 +204,12 @@ export type AlvoCustodia = {
   evidencia_fonte: string | null;
   evidencia_url: string | null;
   site: string | null;
+  // verificação dedicada do modelo de custódia (tabela custodia_verificacao)
+  verif_modelo: ModeloCustodia | null;
+  verif_custodiante: string | null;
+  verif_justificativa: string | null;
+  verif_url: string | null;
+  verif_confianca: number | null;
 };
 
 /** Alvos de auditoria de custódia (Res. BCB 520, art. 73): PSAVs com tag de custódia própria/terceirizada. */
@@ -224,14 +232,18 @@ export function getAlvosCustodia(): AlvoCustodia[] {
                 WHERE f.cnpj = i.cnpj AND (lower(f.descricao) LIKE '%custod%' OR lower(f.descricao) LIKE '%custód%')
                   AND f.url IS NOT NULL AND f.url NOT LIKE '%vertexaisearch%'
                 ORDER BY f.confianca DESC LIMIT 1) evidencia_url,
-              MAX(e.site) site
+              MAX(e.site) site,
+              MAX(v.modelo) verif_modelo, MAX(v.custodiante) verif_custodiante,
+              MAX(v.justificativa) verif_justificativa, MAX(v.evidencia_url) verif_url,
+              MAX(v.confianca) verif_confianca
        FROM tags t
        JOIN instituicoes i ON i.cnpj = t.cnpj
        LEFT JOIN ratings r ON r.cnpj = i.cnpj AND r.mes_ref = i.mes_ref
        LEFT JOIN enriquecimento e ON e.cnpj = i.cnpj
+       LEFT JOIN custodia_verificacao v ON v.cnpj = i.cnpj
        WHERE t.tag IN ('custodia_propria', 'custodia_terceirizada')
        GROUP BY i.cnpj
-       ORDER BY (GROUP_CONCAT(DISTINCT t.tag) LIKE '%propria%') DESC, r.rating DESC, i.razao_social ASC`
+       ORDER BY r.rating DESC, i.razao_social ASC`
     )
     .all() as (Omit<AlvoCustodia, "tags_custodia"> & { tags_csv: string | null })[];
   return rows.map((r) => {
