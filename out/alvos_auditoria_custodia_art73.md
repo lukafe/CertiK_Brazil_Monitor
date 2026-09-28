@@ -9,6 +9,12 @@ Atualizado em 2026-09-28 a partir de `data/monitor.db`. **Metodologia em 2 passa
    *custodiante terceiro nomeado*, exigindo evidência citável e permitindo
    "indeterminado". Resultado: das 40 empresas com custódia própria *declarada*,
    **só 13 foram verificadas como custódia própria de fato**.
+3. **Validação manual (2026-09-28)** — as 13 de custódia própria foram checadas
+   contra fontes primárias (ToS, políticas de custódia, docs oficiais):
+   **10 confirmadas**, 1 inconclusiva (Santander), **Bybit Brasil reclassificada
+   para híbrida** (Zodia Custody no institucional) e **Ripple refutada** (vende
+   *software* de custódia — os clientes detêm as chaves). Saldo final:
+   **11 própria · 4 híbridas · 15 terceirizadas · 18 indeterminadas · 5 fora de escopo**.
 
 Versão web: https://certik-monitor-brasil.vercel.app/custodia
 
@@ -33,34 +39,33 @@ Versão web: https://certik-monitor-brasil.vercel.app/custodia
 
 ---
 
-## Tier 1 — Custódia própria VERIFICADA (13 — obrigação direta, art. 73 §§ 4º-5º)
+## Tier 1 — Custódia própria VERIFICADA + VALIDADA (11 — obrigação direta, art. 73 §§ 4º-5º)
 
-Ordenado por rating. **Conf.** = confiança da verificação; **Chaves/tecnologia** =
-quem/como as chaves são geridas segundo a evidência.
+Ordenado por rating. **Validação** = checagem manual contra fonte primária
+(2026-09-28). Ripple e Bybit Brasil saíram deste tier após a validação.
 
-| # | Empresa (CNPJ) | Rating | Conf. | Chaves/tecnologia | Evidência verificada |
+| # | Empresa (CNPJ) | Rating | Validação | Chaves/tecnologia | Evidência (fonte primária) |
 |---|---|---|---|---|---|
-| 1 | **Transfero** (34.882.109/0001-11) | 74.7 | 0.9 | Fireblocks (como ferramenta) | Custódia institucional "powered by Fireblocks", chaves sob responsabilidade própria |
-| 2 | **Ripio** (23.351.302/0001-00) | 74.6 | 0.9 | MPC próprio | Fundos "sob nossa custódia", tecnologia MPC para gestão de chaves |
-| 3 | **Onda Finance** (54.049.320/0001-65) | 69.1 | 0.9 | Fireblocks (como ferramenta) | Parceria Fireblocks para infra de carteiras; gestão pela própria empresa |
-| 4 | **Payward/Kraken Brasil** (61.533.076/0001-77) | 68.0 | 1.0 | própria | ToS Brasil: mantém ativos em custódia em endereços que a própria empresa controla |
-| 5 | **OnilX** (65.024.286/0001-90) | 66.1 | 1.0 | própria | Afirma "custódia própria de ativos digitais", sem depender de terceiros |
-| 6 | **Coinbase Brasil** (22.268.814/0001-44) | 65.8 | 0.9 | Coinbase, Inc. (grupo) | Coinbase, Inc. armazena as chaves privadas das carteiras hospedadas |
-| 7 | **ASA Digital Assets** (60.483.028/0001-59) | 64.3 | 0.8 | grupo ASA | Termos de uso: valores "geridos e custodiados pelo ASA"; sem custodiante terceiro |
-| 8 | **Bitso Brasil** (51.802.405/0001-84) | 63.8 | 0.9 | própria (+ Coincover p/ recuperação) | Chaves geridas pela plataforma; Coincover só para disaster recovery |
-| 9 | **Santander SPSAV** (12.455.479/0001-30) | 59.7 | 0.9 | própria (closed-loop) | Modelo closed-loop sem saques de cripto — empresa detém as chaves |
-| 10 | **Bybit Brasil** (66.739.170/0001-09) | 55.8 | 0.75 | ByCustody (+ Zodia/Anchorage/Copper p/ institucional) | "Custódia completa na Bybit. Sem chaves privadas" — modelo tende a híbrido |
-| 11 | **Itaú SPSAV / Itaú Digital Assets** (62.718.268/0001-10) | 54.6 | 1.0 | infraestrutura própria (AWS Nitro Enclaves) | Chaves em ambiente próprio: Amazon Managed Blockchain + AWS Nitro Enclaves |
-| 12 | **1Money Brasil** (63.083.006/0001-90) | 54.3 | 0.9 | TSS-MPC próprio | "Custódia regulamentada de nível institucional" com TSS-MPC, sem terceiro |
-| 13 | **Ripple Brasil** (31.857.323/0001-20) | 52.3 | 0.9 | Ripple Custody | Solução própria de custódia enterprise (cold/hot wallet, HSMs) |
+| 1 | **Transfero** (34.882.109/0001-11) | 74.7 | ✅ confirmada | Fireblocks (como ferramenta) | Custódia "powered by Fireblocks" (transfero.com/solutions/crypto-infrastructure) — modelo direct custody |
+| 2 | **Ripio** (23.351.302/0001-00) | 74.6 | ✅ c/ ressalva | MPC próprio | ToS: chaves "controladas pela Ripio e/ou afiliadas **e/ou terceiros**" (terms.ripio.com/br/wallet) — cláusula de possível sub-custódia |
+| 3 | **Onda Finance** (54.049.320/0001-65) | 69.1 | ✅ confirmada | Fireblocks (como ferramenta) | Case oficial Fireblocks: wallet management institucional (fireblocks.com/customers/onda-finance) |
+| 4 | **Payward/Kraken Brasil** (61.533.076/0001-77) | 68.0 | ✅ confirmada | própria | ToS Brasil: "shared blockchain addresses that they control" (kraken.com/legal/br-terms) |
+| 5 | **OnilX** (65.024.286/0001-90) | 66.1 | ✅ confirmada | própria | "Possui custódia própria de ativos digitais" (onilx.com.br/onilx-e-exchange) |
+| 6 | **Coinbase Brasil** (22.268.814/0001-44) | 65.8 | ✅ confirmada (grupo) | grupo Coinbase | User Agreement: "Coinbase retains control over electronic private keys"; p/ não-US o custodiante é Coinbase Bermuda (grupo) |
+| 7 | **ASA Digital Assets** (60.483.028/0001-59) | 64.3 | ✅ confirmada | grupo ASA | "A custódia dos seus ativos será feita pelo ASA... carteiras segregadas" (asa.com.br/digital-assets) |
+| 8 | **Bitso Brasil** (51.802.405/0001-84) | 63.8 | ✅ confirmada | MPC próprio (+ Coincover) | Coincover é explicitamente "non-custodial disaster recovery" integrado à infra MPC da Bitso |
+| 9 | **Santander SPSAV** (12.455.479/0001-30) | 59.7 | ⚠️ inconclusiva | própria (closed-loop) | Contrato cita "estrutura própria de contas de custódia individualizadas"; closed-loop sem saques — mas nenhuma página primária declara quem detém as chaves |
+| 10 | **Itaú SPSAV / Itaú Digital Assets** (62.718.268/0001-10) | 54.6 | ✅ confirmada | infra própria (AWS Nitro Enclaves) | Case oficial AWS: chaves protegidas em Nitro Enclaves, stack próprio de custódia; "custódia própria" no íon |
+| 11 | **1Money Brasil** (63.083.006/0001-90) | 54.3 | ✅ provisória | TSS-MPC próprio | "Regulated custody powered by TSS-MPC" (1money.com) — nenhum custodiante terceiro nomeado |
 
-## Tier 1b — Modelo híbrido VERIFICADO (3 — obrigações dos dois lados)
+## Tier 1b — Modelo híbrido VERIFICADO (4 — obrigações dos dois lados)
 
 | Empresa (CNPJ) | Rating | Conf. | Custodiante | Evidência |
 |---|---|---|---|---|
 | **Nu Crypto / Nubank** (44.342.498/0001-46) | 61.7 | 1.0 | Fireblocks | T&C: custódia pelo próprio Nubank OU custodiantes terceiros; parceria Fireblocks |
 | **Bybit SPSAV** (35.491.577/0001-28) | 61.2 | 0.9 | Anchorage Digital (bbSOL) | Chaves próprias (multi-sig/TEE/TSS) + Anchorage para ativos específicos |
 | **KuCoin Brasil** (61.147.857/0001-23) | 56.6 | 0.9 | BitGo (institucional) | ToS admite custodiante contratado; off-exchange com BitGo para institucional |
+| **Bybit Brasil** (66.739.170/0001-09) | 55.8 | validada | Zodia Custody (institucional) | ⬇ do Tier 1 na validação manual: varejo com chaves próprias (multisig Safe + Ledger); institucional pode manter ativos na Zodia |
 
 ## Tier 2 — Custódia terceirizada VERIFICADA (15 — arts. 73 §6º, 74-75)
 
@@ -110,33 +115,37 @@ descoberta começa com: *quem guarda suas chaves?*
 | **Liquid Gold** (63.539.643/0001-28) | 43.8 | 0.2 | ⚠️ Projeto "tokenized gold" não vinculável ao CNPJ |
 | **Sphere Brasil** (63.593.618/0001-22) | 42.9 | 0.6 | API de pagamentos declara "custódia"; modelo não detalhado |
 
-## Fora de escopo provável (4 — verificação não achou guarda de ativos de clientes)
+## Fora de escopo provável (5 — verificação não achou guarda de ativos de clientes)
 
 | Empresa (CNPJ) | Rating | Conf. | Motivo |
 |---|---|---|---|
 | **Aurex Capital** (60.723.612/0001-34) | 64.2 | 0.9 | ToS: "não detém fundos de clientes"; nunca pede chaves privadas |
+| **Ripple Brasil** (31.857.323/0001-20) | 52.3 | 0.9 | ⬇ REFUTADA na validação manual: vende *software* de custódia — "your keys run in your own infrastructure; Ripple can't sign, freeze, or access them". ⚠️ Pediu licença de PSAV (mar/2026): pode virar custodiante — monitorar |
 | **4Pay Finance** (46.977.494/0001-60) | 62.9 | 1.0 | Ativos vão direto para carteira do cliente (autocustódia) |
 | **Alfred Pay** (63.531.029/0001-10) | 57.4 | 1.0 | ToS: não atua como custodiante ou provedor de carteiras |
 | **Sul Grande Digital** (61.461.894/0001-01) | 52.5 | 0.9 | Negociação com autocustódia — cliente guarda as chaves |
 
 ## Resumo
 
-- **13 verificadas com custódia própria** → obrigação direta de auditoria
-  independente **anual** (art. 73, §§ 4º-5º). Alvos âncora: **Kraken/Payward,
-  Itaú, Coinbase, Bitso, Ripio, Transfero, Santander, Ripple** — grandes, com
-  evidência citável (ToS/docs) de que detêm as chaves.
-- **3 híbridas** (Nubank, Bybit SPSAV, KuCoin) → dupla frente: auditoria da
-  custódia própria + avaliação do custodiante terceiro.
+- **11 com custódia própria verificada E validada manualmente** → obrigação direta
+  de auditoria independente **anual** (art. 73, §§ 4º-5º). Alvos âncora:
+  **Kraken/Payward, Itaú, Coinbase, Bitso, Ripio, Transfero, Santander** — grandes,
+  com evidência primária (ToS/docs) de que detêm as chaves.
+- **4 híbridas** (Nubank, Bybit SPSAV, KuCoin, Bybit Brasil) → dupla frente:
+  auditoria da custódia própria + avaliação do custodiante terceiro.
 - **15 terceirizadas verificadas** → asseguração da política de custódia e due
   diligence do custodiante (arts. 74-75). Custodiantes recorrentes: **BitGo** (6x),
-  **Fireblocks** (4x), Coinbase Prime, B3 Digitas, Cactus Custody.
+  **Fireblocks** (4x), Coinbase Prime, B3 Digitas, Cactus Custody, Zodia.
 - **18 indeterminadas** → em escopo do art. 73 (declaram custódia), mas gestão de
   chaves não pública — segunda onda de prospecção; o gap de transparência é em si
   um argumento de venda da auditoria.
-- **4 fora de escopo provável** (Aurex, 4Pay, Alfred Pay, Sul Grande) — modelos de
-  autocustódia/liquidação imediata; removidas da lista de alvos.
+- **5 fora de escopo provável** (Aurex, 4Pay, Alfred Pay, Sul Grande, **Ripple**) —
+  autocustódia/liquidação imediata/fornecedor de software; removidas da lista de
+  alvos. Ripple em watchlist (pedido de licença PSAV mar/2026).
 - ⚠️ Rebaixar/observar: **Madison** (encerrada set/2026) e **Coinext** (encerrando
   varejo — auditoria ainda relevante na transição/migração da custódia).
 
-*Rótulos "verificados" ainda são pesquisa automatizada (Gemini + grounding com
-exigência de evidência citável) — validar manualmente antes de outreach.*
+*Validação manual (2026-09-28) feita sobre fontes primárias indexadas (ToS,
+políticas de custódia, cases oficiais AWS/Fireblocks/Coincover). Pendências:
+confirmar página primária do Santander sobre chaves e ToS da Coinbase servido
+no Brasil.*
