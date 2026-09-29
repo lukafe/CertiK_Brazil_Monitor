@@ -4,15 +4,21 @@ import { useMemo, useState } from "react";
 import type { Fato } from "@/lib/db";
 import { limparDescricao } from "@/components/ui";
 
-/** Badge de cor por tipo de fato (Etapa 7 — timeline filtrável). */
+/** Badge por tipo de fato — gramática de 3 tons (accent/info/neutral). */
+const TOM = {
+  accent: "border-accent/25 bg-accent/10 text-accent",
+  info: "border-info/25 bg-info/10 text-info",
+  neutral: "border-edge bg-surface-raised text-fg-secondary",
+};
+
 export const TIPO_BADGE: Record<string, { rotulo: string; cls: string }> = {
-  noticia: { rotulo: "📰 News", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
-  site: { rotulo: "🌐 Website", cls: "bg-sky-500/15 text-sky-300 border-sky-500/30" },
-  vaga: { rotulo: "💼 Job opening", cls: "bg-violet-500/15 text-violet-300 border-violet-500/30" },
-  pessoa: { rotulo: "👤 Person", cls: "bg-rose-500/15 text-rose-300 border-rose-500/30" },
-  associacao: { rotulo: "🤝 Association", cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
-  evento: { rotulo: "🎤 Event", cls: "bg-orange-500/15 text-orange-300 border-orange-500/30" },
-  manual: { rotulo: "✍️ Curation", cls: "bg-ink-700 text-slate-400 border-edge" },
+  noticia: { rotulo: "News", cls: TOM.info },
+  site: { rotulo: "Website", cls: TOM.neutral },
+  vaga: { rotulo: "Job opening", cls: TOM.neutral },
+  pessoa: { rotulo: "Person", cls: TOM.info },
+  associacao: { rotulo: "Association", cls: TOM.accent },
+  evento: { rotulo: "Event", cls: TOM.neutral },
+  manual: { rotulo: "Curation", cls: TOM.neutral },
 };
 
 const PERIODOS: [string, number | null][] = [
@@ -23,7 +29,7 @@ const PERIODOS: [string, number | null][] = [
 ];
 
 export function TipoBadge({ tipo }: { tipo: string }) {
-  const b = TIPO_BADGE[tipo] ?? { rotulo: tipo, cls: "bg-ink-700 text-slate-400 border-edge" };
+  const b = TIPO_BADGE[tipo] ?? { rotulo: tipo, cls: TOM.neutral };
   return (
     <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${b.cls}`}>
       {b.rotulo}
@@ -56,11 +62,11 @@ export default function Timeline({ fatos }: { fatos: Fato[] }) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-1.5 border-b border-edge/60 px-4 py-3">
+      <div className="flex flex-wrap items-center gap-1.5 border-b border-edge px-4 py-3">
         <button
           onClick={() => setTipo(null)}
           className={`rounded-full border px-2.5 py-1 text-[11px] transition-colors ${
-            tipo === null ? "border-certik/50 bg-certik/15 text-certik" : "border-edge bg-ink-800 text-slate-400 hover:text-slate-200"
+            tipo === null ? "border-accent/50 bg-accent/15 text-accent" : "border-edge bg-surface-raised text-fg-secondary hover:text-fg"
           }`}
         >
           All ({fatos.length})
@@ -70,7 +76,7 @@ export default function Timeline({ fatos }: { fatos: Fato[] }) {
             key={t}
             onClick={() => setTipo(tipo === t ? null : t)}
             className={`rounded-full border px-2.5 py-1 text-[11px] transition-colors ${
-              tipo === t ? "border-certik/50 bg-certik/15 text-certik" : "border-edge bg-ink-800 text-slate-400 hover:text-slate-200"
+              tipo === t ? "border-accent/50 bg-accent/15 text-accent" : "border-edge bg-surface-raised text-fg-secondary hover:text-fg"
             }`}
           >
             {TIPO_BADGE[t].rotulo} ({fatos.filter((f) => f.tipo === t).length})
@@ -82,7 +88,7 @@ export default function Timeline({ fatos }: { fatos: Fato[] }) {
               key={rotulo}
               onClick={() => setDias(d)}
               className={`rounded px-2 py-1 text-[11px] transition-colors ${
-                dias === d ? "bg-certik/15 text-certik" : "text-slate-500 hover:text-slate-300"
+                dias === d ? "bg-accent/15 text-accent" : "text-fg-muted hover:text-fg-secondary"
               }`}
             >
               {rotulo}
@@ -92,20 +98,20 @@ export default function Timeline({ fatos }: { fatos: Fato[] }) {
       </div>
 
       {visiveis.length ? (
-        <ol className="relative m-4 space-y-5 border-l border-dashed border-rose-500/30 pl-4">
+        <ol className="relative m-4 space-y-5 border-l border-edge pl-4">
           {visiveis.map((f, i) => (
             <li key={i} className="relative">
-              <span className="absolute -left-[21.5px] top-1.5 h-2 w-2 rounded-full bg-rose-500/70" />
-              <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500">
-                <span className="font-mono text-rose-400/80">{dataDoFato(f)}</span>
+              <span className="absolute -left-[21.5px] top-1.5 h-2 w-2 rounded-full bg-accent/70" />
+              <div className="flex flex-wrap items-center gap-2 text-[10px] text-fg-muted">
+                <span className="font-mono">{dataDoFato(f)}</span>
                 <TipoBadge tipo={f.tipo} />
                 {f.fonte && <span>source: {f.fonte}</span>}
                 <span>confidence {(f.confianca * 100).toFixed(0)}%</span>
               </div>
-              <div className="mt-0.5 text-sm leading-relaxed text-slate-300">
+              <div className="mt-0.5 text-sm leading-relaxed text-fg-secondary">
                 {limparDescricao(f.descricao)}
                 {f.url && (
-                  <a href={f.url} target="_blank" rel="noopener noreferrer" className="ml-2 text-certik/80 hover:text-certik">
+                  <a href={f.url} target="_blank" rel="noopener noreferrer" className="ml-2 text-accent/80 hover:text-accent">
                     link ↗
                   </a>
                 )}
@@ -114,7 +120,7 @@ export default function Timeline({ fatos }: { fatos: Fato[] }) {
           ))}
         </ol>
       ) : (
-        <p className="p-4 text-sm text-slate-500">No facts match the selected filter.</p>
+        <p className="p-4 text-sm text-fg-muted">No facts match the selected filter.</p>
       )}
     </div>
   );

@@ -55,41 +55,100 @@ export const TAG_LABEL: Record<string, string> = {
   consultoria: "Consulting",
 };
 
-export function TagChip({ tag, mini = false }: { tag: string; mini?: boolean }) {
+/* ---------------------------------------------------------------------------
+ * Chip — gramática única de chips (3 tons). Tag/Origem/Via/Modelo/timeline
+ * são escolhas de tom, nunca paletas próprias.
+ * ------------------------------------------------------------------------- */
+export type ChipTone = "accent" | "info" | "neutral";
+
+const CHIP_TONE: Record<ChipTone, string> = {
+  accent: "border-accent/25 bg-accent/10 text-accent",
+  info: "border-info/25 bg-info/10 text-info",
+  neutral: "border-edge bg-surface-raised text-fg-secondary",
+};
+
+export function Chip({
+  tone = "neutral",
+  mini = false,
+  title,
+  children,
+}: {
+  tone?: ChipTone;
+  mini?: boolean;
+  title?: string;
+  children: React.ReactNode;
+}) {
   return (
     <span
-      className={`inline-flex items-center whitespace-nowrap rounded-full border border-certik/25 bg-certik/10 font-medium text-certik ${
+      title={title}
+      className={`inline-flex items-center whitespace-nowrap rounded-full border font-medium ${CHIP_TONE[tone]} ${
         mini ? "px-1.5 py-px text-[10px]" : "px-2 py-0.5 text-[11px]"
       }`}
     >
-      {TAG_LABEL[tag] ?? tag}
+      {children}
     </span>
   );
 }
 
-export function notaClasses(nota: string) {
+export function TagChip({ tag, mini = false }: { tag: string; mini?: boolean }) {
+  return (
+    <Chip tone="accent" mini={mini}>
+      {TAG_LABEL[tag] ?? tag}
+    </Chip>
+  );
+}
+
+/* ---------------------------------------------------------------------------
+ * Rampa de score Skynet (melhor → pior) — fonte única de verdade para cores
+ * de notas e scores. Hex idênticos aos tokens --score-* / grade-* do tema.
+ * ------------------------------------------------------------------------- */
+const GRADE_HEX: Record<string, string> = {
+  AAA: "#258c67",
+  AA: "#4f9657",
+  A: "#799f46",
+  BBB: "#cdb225",
+  BB: "#d99728",
+  B: "#d97028",
+  D: "#d94828",
+};
+
+export function gradeColor(nota: string): string {
+  return GRADE_HEX[nota] ?? "#616161";
+}
+
+export function scoreColor(score: number): string {
+  if (score >= 80) return "#258c67";
+  if (score >= 60) return "#799f46";
+  if (score >= 40) return "#cdb225";
+  if (score >= 20) return "#d99728";
+  return "#d94828";
+}
+
+export function gradeClasses(nota: string) {
   switch (nota) {
     case "AAA":
-      return "bg-certik text-black";
+      return "bg-grade-aaa text-white";
     case "AA":
-      return "bg-certik/25 text-certik-bright";
+      return "border border-grade-aa/30 bg-grade-aa/15 text-grade-aa";
     case "A":
-      return "bg-lime-500/20 text-lime-300";
+      return "border border-grade-a/30 bg-grade-a/15 text-grade-a";
     case "BBB":
-      return "bg-sky-500/20 text-sky-300";
+      return "border border-grade-bbb/30 bg-grade-bbb/15 text-grade-bbb";
     case "BB":
-      return "bg-amber-500/20 text-amber-300";
+      return "border border-grade-bb/30 bg-grade-bb/15 text-grade-bb";
     case "B":
-      return "bg-orange-500/20 text-orange-300";
+      return "border border-grade-b/30 bg-grade-b/15 text-grade-b";
+    case "D":
+      return "border border-grade-d/30 bg-grade-d/15 text-grade-d";
     default:
-      return "bg-ink-700 text-slate-500";
+      return "bg-surface-raised text-fg-muted";
   }
 }
 
 export function NotaBadge({ nota, size = "sm" }: { nota: string; size?: "sm" | "lg" }) {
   return (
     <span
-      className={`inline-flex items-center justify-center rounded font-bold tracking-tight ${notaClasses(nota)} ${
+      className={`inline-flex items-center justify-center rounded font-bold tracking-tight ${gradeClasses(nota)} ${
         size === "lg" ? "px-3 py-1 text-xl" : "px-1.5 py-0.5 text-[11px]"
       }`}
     >
@@ -99,11 +158,13 @@ export function NotaBadge({ nota, size = "sm" }: { nota: string; size?: "sm" | "
 }
 
 export function ScoreChip({ score, size = "sm" }: { score: number; size?: "sm" | "lg" }) {
+  const cor = scoreColor(score);
   return (
     <span
-      className={`inline-flex items-center justify-center rounded bg-certik-deep font-semibold tabular-nums text-certik ${
+      className={`inline-flex items-center justify-center rounded font-mono font-semibold tabular-nums ${
         size === "lg" ? "px-3 py-1 text-4xl tracking-tight" : "px-1.5 py-0.5 text-[11px]"
       }`}
+      style={{ color: cor, backgroundColor: `${cor}26` }}
     >
       {score.toFixed(2)}
     </span>
@@ -120,26 +181,13 @@ export function ScoreNota({ score, nota }: { score: number; nota: string }) {
   );
 }
 
-const GRADS = [
-  "from-emerald-400 to-cyan-600",
-  "from-sky-400 to-indigo-600",
-  "from-fuchsia-400 to-purple-600",
-  "from-amber-400 to-orange-600",
-  "from-rose-400 to-red-600",
-  "from-teal-400 to-emerald-600",
-  "from-violet-400 to-blue-600",
-  "from-lime-400 to-green-600",
-];
-
 export function Avatar({ nome, size = 32 }: { nome: string; size?: number }) {
   const limpo = nome.replace(/[^A-Za-zÀ-ú ]/g, " ").trim();
   const partes = limpo.split(/\s+/).filter((p) => p.length > 1);
   const ini = ((partes[0]?.[0] ?? "?") + (partes[1]?.[0] ?? "")).toUpperCase();
-  let h = 0;
-  for (let i = 0; i < nome.length; i++) h = (h * 31 + nome.charCodeAt(i)) >>> 0;
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br font-bold text-black/80 ${GRADS[h % GRADS.length]}`}
+      className="inline-flex shrink-0 items-center justify-center rounded-md border border-edge-strong bg-surface-raised font-semibold text-fg-secondary"
       style={{ width: size, height: size, fontSize: size * 0.34 }}
     >
       {ini}
@@ -148,7 +196,7 @@ export function Avatar({ nome, size = 32 }: { nome: string; size?: number }) {
 }
 
 export function HexIcon({ score, size = 14 }: { score: number; size?: number }) {
-  const cor = score >= 55 ? "#3fe0a8" : score >= 25 ? "#fbbf24" : "#475569";
+  const cor = scoreColor(score);
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" className="shrink-0">
       <polygon
@@ -177,10 +225,10 @@ export function Painel({
   id?: string;
 }) {
   return (
-    <section id={id} className={`rounded-xl border border-edge bg-ink-900 ${className}`}>
+    <section id={id} className={`rounded-lg border border-edge bg-surface ${className}`}>
       {titulo && (
         <div className="flex items-center justify-between border-b border-edge px-4 py-3">
-          <h2 className="text-sm font-semibold text-white">{titulo}</h2>
+          <h2 className="text-[13px] font-semibold uppercase tracking-wide text-fg-secondary">{titulo}</h2>
           {acao}
         </div>
       )}
@@ -193,7 +241,7 @@ export function OrigemChip({ origem }: { origem: string }) {
   return (
     <span
       className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
-        origem === "SPSAV" ? "bg-certik/15 text-certik" : "bg-sky-500/15 text-sky-300"
+        origem === "SPSAV" ? "bg-accent/15 text-accent" : "bg-info/15 text-info"
       }`}
     >
       {origem === "INCUMBENTE" ? "INCUMBENT" : origem}
@@ -208,7 +256,7 @@ export function ViaChip({ via }: { via: string | null }) {
     <span
       title={via}
       className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
-        in701 ? "bg-cyan-500/10 text-cyan-400" : "bg-purple-500/10 text-purple-400"
+        in701 ? "bg-info/10 text-info" : "bg-surface-raised text-fg-secondary"
       }`}
     >
       {in701 ? "IN 701" : "IN 704"}
@@ -284,7 +332,7 @@ function LinkIcone({
       target="_blank"
       rel="noopener noreferrer"
       title={title}
-      className={`inline-flex items-center justify-center rounded-lg border border-edge bg-ink-800 text-slate-400 transition-colors hover:border-certik/40 hover:text-certik ${
+      className={`inline-flex items-center justify-center rounded-md border border-edge bg-surface-raised text-fg-muted transition-colors hover:border-accent/40 hover:text-accent ${
         mini ? "h-6 w-6" : "h-9 w-9"
       }`}
     >

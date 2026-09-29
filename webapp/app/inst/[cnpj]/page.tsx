@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEnriquecimento, getEventos, getFatos, getGrupoMembros, getInstituicao, getSnapshots, getTodosCnpjs, montarLinks } from "@/lib/db";
-import { Avatar, LinksExternos, NotaBadge, OrigemChip, Painel, TagChip, ViaChip, segCurto } from "@/components/ui";
+import { Avatar, LinksExternos, NotaBadge, OrigemChip, Painel, ShieldLogo, TagChip, ViaChip, scoreColor, segCurto } from "@/components/ui";
 import Radar from "@/components/radar";
 import Sparkline from "@/components/sparkline";
 import Share from "@/components/share";
@@ -35,25 +35,27 @@ function fmtCapital(c: string | null) {
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-wider text-slate-600">{label}</div>
-      <div className="mt-0.5 text-sm text-slate-200">{children || "—"}</div>
+      <div className="text-[10px] uppercase tracking-wider text-fg-muted">{label}</div>
+      <div className="mt-0.5 text-sm text-fg">{children || "—"}</div>
     </div>
   );
 }
 
 function PilarBar({ nome, peso, valor }: { nome: string; peso: number; valor: number | null }) {
   const v = valor ?? 0;
-  const cor = v >= 70 ? "bg-certik" : v >= 40 ? "bg-amber-400" : "bg-ink-600";
   return (
     <div>
       <div className="mb-1 flex items-baseline justify-between text-xs">
-        <span className="text-slate-300">
-          {nome} <span className="text-slate-600">({(peso * 100).toFixed(0)}%)</span>
+        <span className="text-fg-secondary">
+          {nome} <span className="text-fg-muted">({(peso * 100).toFixed(0)}%)</span>
         </span>
-        <span className="font-mono text-slate-400">{v.toFixed(0)}</span>
+        <span className="font-mono text-fg-secondary">{v.toFixed(0)}</span>
       </div>
-      <div className="h-1.5 w-full rounded bg-ink-700">
-        <div className={`h-1.5 rounded ${cor}`} style={{ width: `${Math.min(100, v)}%` }} />
+      <div className="h-1.5 w-full rounded bg-surface-raised">
+        <div
+          className="h-1.5 rounded"
+          style={{ width: `${Math.min(100, v)}%`, backgroundColor: scoreColor(v) }}
+        />
       </div>
     </div>
   );
@@ -61,19 +63,19 @@ function PilarBar({ nome, peso, valor }: { nome: string; peso: number; valor: nu
 
 function SinalLinha({ nome, on, evidencia }: { nome: string; on: boolean | null; evidencia?: string | null }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-edge/60 py-2.5 last:border-0">
+    <div className="flex items-start justify-between gap-3 border-b border-edge py-2.5 last:border-0">
       <div className="min-w-0">
-        <div className="text-sm text-slate-300">{nome}</div>
-        {evidencia && <div className="mt-1 break-words text-xs text-slate-500">{evidencia}</div>}
+        <div className="text-sm text-fg-secondary">{nome}</div>
+        {evidencia && <div className="mt-1 break-words text-xs text-fg-muted">{evidencia}</div>}
       </div>
       <span
         className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
-          on ? "bg-certik/15 text-certik" : "bg-ink-700 text-slate-500"
+          on ? "bg-accent/15 text-accent" : "bg-surface-raised text-fg-muted"
         }`}
       >
         <span
           className={`inline-flex h-3.5 w-3.5 items-center justify-center rounded-full text-[9px] ${
-            on ? "bg-certik text-black" : "bg-ink-600 text-slate-500"
+            on ? "bg-accent text-accent-on" : "bg-surface-overlay text-fg-muted"
           }`}
         >
           {on ? "✓" : "–"}
@@ -129,7 +131,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
       {/* ============ coluna esquerda ============ */}
       <div className="min-w-0 space-y-5">
         <div className="flex flex-wrap items-center gap-1 border-b border-edge pb-0">
-          <Link href="/" className="mr-3 flex items-center gap-1.5 pb-3 text-sm text-slate-500 hover:text-white">
+          <Link href="/" className="mr-3 flex items-center gap-1.5 pb-3 text-sm text-fg-muted hover:text-fg">
             ← Back
           </Link>
           {TABS.filter(([href]) => {
@@ -143,8 +145,8 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
               href={href}
               className={`border-b-2 px-3 pb-3 text-sm font-medium transition-colors ${
                 i === 0
-                  ? "border-white text-white"
-                  : "border-transparent text-slate-500 hover:border-slate-600 hover:text-slate-300"
+                  ? "border-accent text-fg"
+                  : "border-transparent text-fg-muted hover:border-edge-strong hover:text-fg-secondary"
               }`}
             >
               {label}
@@ -158,7 +160,8 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
           titulo={
             <span className="flex items-center gap-2">
               Pulse Feed & Facts
-              <span className="rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-semibold text-rose-400">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-edge bg-surface-raised px-2 py-0.5 text-[10px] font-semibold text-fg-secondary">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-alert" />
                 {fatos.length}
               </span>
             </span>
@@ -167,25 +170,29 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
           {fatos.length ? (
             <Timeline fatos={fatos} />
           ) : (
-            <p className="p-4 text-sm text-slate-500">No facts collected yet for this institution.</p>
+            <p className="p-4 text-sm text-fg-muted">No facts collected yet for this institution.</p>
           )}
         </Painel>
 
-        <section id="regulatorio" className="scroll-mt-20 overflow-hidden rounded-xl border border-edge bg-ink-900">
-          <div className="flex items-center gap-3 border-b border-edge bg-gradient-to-r from-certik-deep/60 to-transparent px-4 py-4">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-certik/15 text-lg">🛡️</span>
-            <h2 className="text-lg font-semibold text-white">Rating Pillars</h2>
-            <span className="ml-auto flex items-center gap-1.5 text-certik">
-              <span className="text-xl font-bold">{inst.rating.toFixed(0)}</span>
-              <span className="text-xs text-slate-500">/100</span>
+        <section id="regulatorio" className="scroll-mt-20 overflow-hidden rounded-lg border border-edge bg-surface">
+          <div className="flex items-center gap-3 border-b border-edge bg-gradient-to-r from-accent-deep/60 to-transparent px-4 py-4">
+            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-accent/15">
+              <ShieldLogo size={18} cor="var(--accent)" />
+            </span>
+            <h2 className="text-lg font-semibold text-fg">Rating Pillars</h2>
+            <span className="ml-auto flex items-center gap-1.5">
+              <span className="font-mono text-xl font-bold" style={{ color: scoreColor(inst.rating) }}>
+                {inst.rating.toFixed(0)}
+              </span>
+              <span className="text-xs text-fg-muted">/100</span>
             </span>
           </div>
           <div className="space-y-3 p-4">
             {pilares.map(([n, peso, valor]) => (
               <PilarBar key={n} nome={n} peso={peso} valor={valor} />
             ))}
-            <div className="mt-2 rounded-lg border border-edge bg-ink-800 px-3 py-2.5 text-xs text-slate-400">
-              Regulatory path: <span className="text-slate-200">{inst.via ?? "—"}</span>
+            <div className="mt-2 rounded-md border border-edge bg-surface-raised px-3 py-2.5 text-xs text-fg-secondary">
+              Regulatory path: <span className="text-fg">{inst.via ?? "—"}</span>
               {inst.via?.startsWith("IN 701")
                 ? " — institution already authorized by the BCB; entry into virtual assets via communication."
                 : " — new entrant; requires prior BCB authorization."}
@@ -194,7 +201,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
         </section>
 
         {inst.origem === "INCUMBENTE" && (
-          <Painel id="sinais" className="scroll-mt-20" titulo="Signals of movement into virtual assets" acao={<span className="text-[11px] text-slate-500">{nSinais} active</span>}>
+          <Painel id="sinais" className="scroll-mt-20" titulo="Signals of movement into virtual assets" acao={<span className="text-[11px] text-fg-muted">{nSinais} active</span>}>
             <div className="px-4 py-1.5">
               <SinalLinha
                 nome="Economic group linked to an SPSAV"
@@ -224,15 +231,15 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
 
         {grupo.length > 0 && (
           <Painel id="grupo" className="scroll-mt-20" titulo={`Group ${inst.grupo_nome} — other entities (${grupo.length})`}>
-            <ul className="divide-y divide-edge/60">
+            <ul className="divide-y divide-edge">
               {grupo.map((m) => (
                 <li key={m.cnpj}>
-                  <Link href={`/inst/${m.cnpj}`} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-ink-800">
+                  <Link href={`/inst/${m.cnpj}`} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-surface-raised">
                     <Avatar nome={m.nome_fantasia || m.razao_social} size={28} />
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium text-slate-200">{m.razao_social}</div>
-                      <div className="truncate text-xs text-slate-500" title={m.segmento}>
-                        {segCurto(m.segmento)} · {fmtCnpj(m.cnpj)}
+                      <div className="truncate text-sm font-medium text-fg">{m.razao_social}</div>
+                      <div className="truncate text-xs text-fg-muted" title={m.segmento}>
+                        {segCurto(m.segmento)} · <span className="font-mono">{fmtCnpj(m.cnpj)}</span>
                       </div>
                     </div>
                     <OrigemChip origem={m.origem} />
@@ -246,7 +253,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
 
         {inst.socios && (
           <Painel id="socios" className="scroll-mt-20" titulo="Partners">
-            <ul className="divide-y divide-edge/60 text-sm text-slate-300">
+            <ul className="divide-y divide-edge text-sm text-fg-secondary">
               {inst.socios.split(" | ").map((s, i) => (
                 <li key={i} className="flex items-center gap-3 px-4 py-2">
                   <Avatar nome={s} size={22} />
@@ -261,9 +268,9 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
           <Painel titulo="Score history">
             {snapshots.length ? (
               <div className="p-4">
-                <div className="flex items-baseline justify-between text-xs text-slate-500">
+                <div className="flex items-baseline justify-between font-mono text-xs text-fg-muted">
                   <span>{snapshots[0].mes_ref}</span>
-                  <span className="font-mono text-sm text-certik">{snapshots[snapshots.length - 1].score}</span>
+                  <span className="text-sm text-accent">{snapshots[snapshots.length - 1].score}</span>
                   <span>{snapshots[snapshots.length - 1].mes_ref}</span>
                 </div>
                 <div className="mt-2">
@@ -271,21 +278,21 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
                 </div>
               </div>
             ) : (
-              <p className="p-4 text-sm text-slate-500">No history yet.</p>
+              <p className="p-4 text-sm text-fg-muted">No history yet.</p>
             )}
           </Painel>
           <Painel titulo="Timeline">
             {eventos.length ? (
               <ul className="space-y-3 p-4">
                 {eventos.map((e, i) => (
-                  <li key={i} className="border-l-2 border-certik/40 pl-3">
-                    <div className="text-xs text-slate-500">{e.mes_ref}</div>
-                    <div className="text-sm text-slate-300">{e.descricao}</div>
+                  <li key={i} className="border-l-2 border-accent/40 pl-3">
+                    <div className="font-mono text-xs text-fg-muted">{e.mes_ref}</div>
+                    <div className="text-sm text-fg-secondary">{e.descricao}</div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="p-4 text-sm text-slate-500">No events yet — populated by the upcoming monthly runs.</p>
+              <p className="p-4 text-sm text-fg-muted">No events yet — populated by the upcoming monthly runs.</p>
             )}
           </Painel>
         </div>
@@ -299,7 +306,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
               <Avatar nome={nome} size={52} />
               <div className="min-w-0">
                 <div className="flex items-start gap-2">
-                  <h1 className="line-clamp-2 min-w-0 text-xl font-bold leading-tight text-white" title={inst.razao_social}>
+                  <h1 className="line-clamp-2 min-w-0 text-xl font-bold leading-tight text-fg" title={inst.razao_social}>
                     {nome}
                   </h1>
                   <span className="mt-0.5 shrink-0">
@@ -307,20 +314,17 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
                   </span>
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
-                    🏅 {inst.origem === "SPSAV" ? "SPSAV" : "Incumbent"} · {inst.via?.startsWith("IN 701") ? "IN 701" : "IN 704"}
-                  </span>
                   <OrigemChip origem={inst.origem} />
                   <ViaChip via={inst.via} />
                 </div>
               </div>
             </div>
-            {inst.nome_fantasia && <div className="mt-2 truncate text-xs text-slate-500">{inst.razao_social}</div>}
-            <div className="mt-1 font-mono text-xs text-slate-500">{fmtCnpj(inst.cnpj)}</div>
+            {inst.nome_fantasia && <div className="mt-2 truncate text-xs text-fg-muted">{inst.razao_social}</div>}
+            <div className="mt-1 font-mono text-xs text-fg-muted">{fmtCnpj(inst.cnpj)}</div>
 
             {(enr?.descricao || (enr?.tags.length ?? 0) > 0) && (
               <div className="mt-4 border-t border-edge pt-4">
-                {enr?.descricao && <p className="text-sm leading-relaxed text-slate-300">{enr.descricao}</p>}
+                {enr?.descricao && <p className="text-sm leading-relaxed text-fg-secondary">{enr.descricao}</p>}
                 {enr && enr.tags.length > 0 && (
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
                     {enr.tags.map((t) => (
@@ -331,7 +335,7 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
                 {produtos.length > 0 && (
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
                     {produtos.slice(0, 6).map((p) => (
-                      <span key={p} className="rounded-full border border-edge bg-ink-800 px-2 py-0.5 text-[11px] text-slate-400">
+                      <span key={p} className="rounded-full border border-edge bg-surface-raised px-2 py-0.5 text-[11px] text-fg-secondary">
                         {p}
                       </span>
                     ))}
@@ -348,8 +352,8 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
                 ["Status", inst.situacao === "02" ? "Active" : inst.situacao ?? "—"],
               ].map(([l, v]) => (
                 <div key={l as string}>
-                  <div className="text-[10px] uppercase tracking-wider text-slate-600">{l}</div>
-                  <div className="mt-0.5 truncate text-sm font-semibold text-slate-200">{v}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-fg-muted">{l}</div>
+                  <div className="mt-0.5 truncate text-sm font-semibold text-fg">{v}</div>
                 </div>
               ))}
             </div>
@@ -358,11 +362,16 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
 
         <Painel>
           <div className="p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold text-white">
-              CertiK Skynet Score <span className="rounded bg-certik/15 px-1 text-[10px] text-certik">β</span>
+            <div className="flex items-center gap-2 text-sm font-semibold text-fg">
+              CertiK Skynet Score <span className="rounded bg-accent/15 px-1 text-[10px] text-accent">β</span>
             </div>
-            <div className="mt-3 flex items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-certik-deep/80 to-ink-800 py-4">
-              <span className="text-5xl font-bold tracking-tight text-certik">{inst.rating.toFixed(2)}</span>
+            <div className="mt-3 flex items-center justify-center gap-3 rounded-lg bg-gradient-to-br from-accent-deep/80 to-surface-raised py-4">
+              <span
+                className="font-mono text-5xl font-bold tracking-tight"
+                style={{ color: scoreColor(inst.rating) }}
+              >
+                {inst.rating.toFixed(2)}
+              </span>
               <NotaBadge nota={inst.nota} size="lg" />
             </div>
             <Radar
@@ -372,18 +381,18 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
                 valor: valor ?? 0,
               }))}
             />
-            <div className="mb-3 flex items-center justify-between rounded-lg border border-edge bg-ink-800 px-3 py-2.5">
-              <span className="text-[10px] uppercase tracking-wider text-slate-500">Online presence</span>
+            <div className="mb-3 flex items-center justify-between rounded-md border border-edge bg-surface-raised px-3 py-2.5">
+              <span className="text-[10px] uppercase tracking-wider text-fg-muted">Online presence</span>
               <LinksExternos links={links} nome={inst.razao_social} />
             </div>
             <div className="grid grid-cols-4 gap-2">
               {[
-                { n: fatos.length, cls: "bg-certik/10 text-certik", icone: "🛡", t: "Facts collected" },
-                { n: nPessoas, cls: "bg-sky-500/10 text-sky-300", icone: "ℹ", t: "Key people" },
-                { n: nNoticias, cls: "bg-amber-500/10 text-amber-300", icone: "!", t: "News" },
-                { n: nSinais, cls: "bg-ink-700 text-slate-400", icone: "⚠", t: "Active signals" },
+                { n: fatos.length, cls: "bg-accent/10 text-accent", icone: "🛡", t: "Facts collected" },
+                { n: nPessoas, cls: "bg-info/10 text-info", icone: "ℹ", t: "Key people" },
+                { n: nNoticias, cls: "bg-score-3/10 text-score-3", icone: "!", t: "News" },
+                { n: nSinais, cls: "bg-surface-raised text-fg-secondary", icone: "⚠", t: "Active signals" },
               ].map((c, i) => (
-                <div key={i} title={c.t} className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-semibold ${c.cls}`}>
+                <div key={i} title={c.t} className={`flex items-center justify-center gap-1.5 rounded-md py-2 font-mono text-sm font-semibold ${c.cls}`}>
                   <span className="text-xs opacity-80">{c.icone}</span>
                   {c.n}
                 </div>
@@ -395,14 +404,14 @@ export default function InstituicaoPage({ params }: { params: { cnpj: string } }
         {grupo.length > 0 && (
           <Painel titulo="Economic group">
             <div className="flex flex-wrap gap-2 p-4">
-              <span className="rounded-lg border border-edge bg-ink-800 px-2.5 py-1.5 text-xs text-slate-400">
-                ⛓ {inst.grupo_nome} · {grupo.length + 1} entities
+              <span className="rounded-md border border-edge bg-surface-raised px-2.5 py-1.5 text-xs text-fg-secondary">
+                {inst.grupo_nome} · {grupo.length + 1} entities
               </span>
               {grupo.slice(0, 6).map((m) => (
                 <Link
                   key={m.cnpj}
                   href={`/inst/${m.cnpj}`}
-                  className="flex items-center gap-1.5 rounded-lg border border-edge bg-ink-800 px-2.5 py-1.5 text-xs text-slate-300 transition-colors hover:border-certik/40 hover:text-white"
+                  className="flex items-center gap-1.5 rounded-md border border-edge bg-surface-raised px-2.5 py-1.5 text-xs text-fg-secondary transition-colors hover:border-accent/40 hover:text-fg"
                 >
                   <Avatar nome={m.nome_fantasia || m.razao_social} size={16} />
                   <span className="max-w-[140px] truncate">{m.nome_fantasia || m.razao_social}</span>

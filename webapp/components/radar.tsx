@@ -31,20 +31,19 @@ export default function Radar({
         <polygon
           key={f}
           points={poligono(cx, cy, R * f, n)}
-          fill={f === 1 ? "#16191d" : "none"}
-          stroke="#262b31"
+          fill={f === 1 ? "var(--surface-raised)" : "none"}
+          stroke="var(--edge-subtle)"
           strokeWidth="1"
         />
       ))}
       {eixos.map((_, i) => {
         const [x, y] = ponto(cx, cy, R, i, n);
-        return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="#262b31" strokeWidth="1" />;
+        return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="var(--edge-subtle)" strokeWidth="1" />;
       })}
-      <polygon points={dados} fill="#3fe0a8" fillOpacity="0.3" stroke="#3fe0a8" strokeWidth="1.5" />
-      <polygon points={dados} fill="#fbbf24" fillOpacity="0.12" />
+      <polygon points={dados} fill="var(--accent)" fillOpacity="0.3" stroke="var(--accent)" strokeWidth="1.5" />
       {eixos.map((e, i) => {
         const [px, py] = ponto(cx, cy, (Math.max(0, Math.min(100, e.valor)) / 100) * R, i, n);
-        return <circle key={i} cx={px} cy={py} r="2.5" fill="#3fe0a8" />;
+        return <circle key={i} cx={px} cy={py} r="2.5" fill="var(--accent)" />;
       })}
       {eixos.map((e, i) => {
         const [x, y] = ponto(cx, cy, R + 26, i, n);
@@ -56,7 +55,7 @@ export default function Radar({
             y={y}
             textAnchor={anchor}
             dominantBaseline="middle"
-            fill="#94a3b8"
+            fill="var(--fg-secondary)"
             fontSize="11"
           >
             {e.label}

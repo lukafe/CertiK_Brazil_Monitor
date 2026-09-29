@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Sidebar from "@/components/sidebar";
 import Topbar from "@/components/topbar";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const mono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-mono",
+  weight: "100 900",
+});
 
 export const metadata: Metadata = {
   title: "CertiK MONITOR Brasil",
@@ -14,7 +20,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} min-h-screen bg-ink-950 text-slate-200 antialiased`}>
+      <body
+        className={`${inter.variable} ${mono.variable} font-sans min-h-screen bg-surface-sunken text-fg antialiased`}
+      >
         <Sidebar />
         <div className="pl-14 lg:pl-56">
           <Topbar />

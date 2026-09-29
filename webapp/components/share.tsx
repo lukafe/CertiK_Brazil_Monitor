@@ -8,7 +8,7 @@ export default function Share() {
     <span className="inline-flex items-center gap-1.5">
       <button
         title="Favorite"
-        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-edge bg-ink-800 text-slate-500 transition-colors hover:border-amber-500/40 hover:text-amber-300"
+        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-edge bg-surface-raised text-fg-muted transition-colors hover:border-accent/40 hover:text-accent"
       >
         ☆
       </button>
@@ -19,7 +19,7 @@ export default function Share() {
           setCopiado(true);
           setTimeout(() => setCopiado(false), 1500);
         }}
-        className="inline-flex h-7 items-center justify-center gap-1 rounded-lg border border-edge bg-ink-800 px-2 text-xs text-slate-500 transition-colors hover:border-certik/40 hover:text-certik"
+        className="inline-flex h-7 items-center justify-center gap-1 rounded-md border border-edge bg-surface-raised px-2 text-xs text-fg-muted transition-colors hover:border-accent/40 hover:text-accent"
       >
         {copiado ? "✓ copied" : "⤴ share"}
       </button>

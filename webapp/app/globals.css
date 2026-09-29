@@ -2,12 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Design tokens — paleta CertiK Skynet (extraída dos assets de produção).
+ * IMPORTANTE: os mesmos hex existem em tailwind.config.ts (para os modifiers
+ * de opacidade tipo bg-accent/10). Mantenha os dois arquivos em sincronia.
+ * As CSS vars abaixo existem para consumo em SVGs (fill/stroke: var(--x)).
+ */
+:root {
+  /* superfícies (família navy #171921) */
+  --surface-sunken: #101218;
+  --surface-base: #171921;
+  --surface-raised: #1d2029;
+  --surface-overlay: #232734;
+  /* bordas */
+  --edge-subtle: #262a35;
+  --edge-strong: #363b48;
+  /* foreground (cinzas Skynet) */
+  --fg-primary: #f4f4f4;
+  --fg-secondary: #a0a1a6;
+  --fg-muted: #616161;
+  /* accent mint */
+  --accent: #5ef2b8;
+  --accent-bright: #4efac9;
+  --accent-deep: #0f2b21;
+  --on-accent: #171921;
+  /* semânticos */
+  --info: #25a6f5;
+  --info-light: #8bddff;
+  --alert: #ff4b4b;
+  --alert-deep: #e5453d;
+  /* rampa de score (melhor → pior) */
+  --score-1: #258c67;
+  --score-2: #799f46;
+  --score-3: #cdb225;
+  --score-4: #d99728;
+  --score-5: #d94828;
+  /* interpolações de grau */
+  --grade-aa: #4f9657;
+  --grade-b: #d97028;
+}
+
 body {
-  background: #0b0d10;
+  background: var(--surface-sunken);
+  color: var(--fg-primary);
 }
 
 ::selection {
-  background: rgba(63, 224, 168, 0.25);
+  background: rgba(94, 242, 184, 0.25);
 }
 
 ::-webkit-scrollbar {
@@ -15,7 +56,7 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #23272d;
+  background: var(--edge-strong);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-track {

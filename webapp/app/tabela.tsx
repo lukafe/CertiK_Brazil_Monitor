@@ -11,7 +11,7 @@ function Sinal({ on, title, children }: { on: boolean; title: string; children: 
     <span
       title={title}
       className={`inline-flex h-6 w-6 items-center justify-center rounded text-xs ${
-        on ? "bg-certik/15 text-certik" : "bg-ink-700 text-slate-600"
+        on ? "bg-accent/15 text-accent" : "bg-surface-raised text-fg-muted"
       }`}
     >
       {children}
@@ -123,8 +123,8 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
         {col ? (
           <button
             onClick={() => ordenar(col)}
-            className={`inline-flex items-center gap-1 uppercase tracking-wider transition-colors hover:text-slate-300 ${
-              ordCol === col ? "text-certik" : ""
+            className={`inline-flex items-center gap-1 uppercase tracking-wider transition-colors hover:text-fg-secondary ${
+              ordCol === col ? "text-accent" : ""
             }`}
           >
             {children}
@@ -138,8 +138,8 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
   }
 
   const sel =
-    "rounded-lg border border-edge bg-ink-900 px-2.5 py-1.5 text-xs text-slate-300 outline-none focus:border-certik/50";
-  const chk = "flex cursor-pointer items-center gap-1.5 text-xs text-slate-400";
+    "rounded-md border border-edge bg-surface-raised px-2.5 py-1.5 text-xs text-fg-secondary outline-none focus:border-accent/50";
+  const chk = "flex cursor-pointer items-center gap-1.5 text-xs text-fg-secondary";
 
   return (
     <div className="space-y-3">
@@ -200,25 +200,25 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
           <option value={1_000_000_000}>≥ R$ 1B</option>
         </select>
         <label className={chk}>
-          <input type="checkbox" checked={soAtivas} onChange={(e) => setSoAtivas(e.target.checked)} className="accent-[#3fe0a8]" />
+          <input type="checkbox" checked={soAtivas} onChange={(e) => setSoAtivas(e.target.checked)} className="accent-[#5ef2b8]" />
           active only
         </label>
         <label className={chk}>
-          <input type="checkbox" checked={comAssociacao} onChange={(e) => setComAssociacao(e.target.checked)} className="accent-[#3fe0a8]" />
+          <input type="checkbox" checked={comAssociacao} onChange={(e) => setComAssociacao(e.target.checked)} className="accent-[#5ef2b8]" />
           in association
         </label>
         <label className={chk}>
-          <input type="checkbox" checked={agrupar} onChange={(e) => setAgrupar(e.target.checked)} className="accent-[#3fe0a8]" />
+          <input type="checkbox" checked={agrupar} onChange={(e) => setAgrupar(e.target.checked)} className="accent-[#5ef2b8]" />
           merge groups
         </label>
-        <span className="ml-auto text-xs tabular-nums text-slate-500">
+        <span className="ml-auto font-mono text-xs tabular-nums text-fg-muted">
           {agrupar ? `${exibidas.length} groups/institutions · ${filtradas.length} entities` : `${filtradas.length} entities`}
         </span>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-edge bg-ink-900">
+      <div className="overflow-x-auto rounded-lg border border-edge bg-surface">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 z-10 bg-ink-900 text-left text-[11px] uppercase tracking-wider text-slate-500">
+          <thead className="sticky top-0 z-10 bg-surface text-left text-[11px] uppercase tracking-wider text-fg-muted">
             <tr className="border-b border-edge">
               <th className="px-3 py-2.5 font-medium">#</th>
               <Th col="razao_social">Institution</Th>
@@ -234,26 +234,26 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
           </thead>
           <tbody>
             {pagina.map(({ r, extras }, i) => (
-              <tr key={r.cnpj} className="border-t border-edge/60 transition-colors even:bg-ink-800/30 hover:bg-ink-800">
-                <td className="px-3 py-2 text-xs tabular-nums text-slate-600">
-                  <span className="inline-flex min-w-[26px] justify-center rounded bg-ink-700 px-1 py-0.5">{i + 1}</span>
+              <tr key={r.cnpj} className="border-t border-edge transition-colors hover:bg-surface-raised">
+                <td className="px-3 py-2 font-mono text-xs tabular-nums text-fg-muted">
+                  <span className="inline-flex min-w-[26px] justify-center rounded bg-surface-overlay px-1 py-0.5">{i + 1}</span>
                 </td>
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-2.5">
                     <Avatar nome={r.nome_fantasia || r.razao_social} size={28} />
                     <div className="min-w-0">
-                      <Link href={`/inst/${r.cnpj}`} title={r.razao_social} className="font-medium text-slate-100 hover:text-certik">
+                      <Link href={`/inst/${r.cnpj}`} title={r.razao_social} className="font-medium text-fg hover:text-accent">
                         {r.razao_social}
                       </Link>
                       {extras > 0 && (
                         <span
-                          className="ml-2 rounded-full border border-edge bg-ink-700 px-2 py-0.5 text-[10px] text-slate-300"
+                          className="ml-2 rounded-full border border-edge bg-surface-raised px-2 py-0.5 text-[10px] text-fg-secondary"
                           title={`Group ${r.grupo_nome}: ${extras} more entit${extras > 1 ? "ies" : "y"} in the universe`}
                         >
                           ⛓ +{extras}
                         </span>
                       )}
-                      {r.nome_fantasia && <div className="truncate text-xs text-slate-500">{r.nome_fantasia}</div>}
+                      {r.nome_fantasia && <div className="truncate text-xs text-fg-muted">{r.nome_fantasia}</div>}
                     </div>
                   </div>
                 </td>
@@ -269,7 +269,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
                 <td className="px-3 py-2">
                   <OrigemChip origem={r.origem} />
                 </td>
-                <td className="px-3 py-2 text-xs text-slate-400" title={r.segmento}>
+                <td className="px-3 py-2 text-xs text-fg-secondary" title={r.segmento}>
                   {segCurto(r.segmento)}
                 </td>
                 <td className="px-3 py-2">
@@ -278,10 +278,10 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
                       {r.tags.slice(0, 3).map((t) => (
                         <TagChip key={t} tag={t} mini />
                       ))}
-                      {r.tags.length > 3 && <span className="text-[10px] text-slate-500">+{r.tags.length - 3}</span>}
+                      {r.tags.length > 3 && <span className="text-[10px] text-fg-muted">+{r.tags.length - 3}</span>}
                     </div>
                   ) : (
-                    <span className="text-xs text-slate-600">—</span>
+                    <span className="text-xs text-fg-muted">—</span>
                   )}
                 </td>
                 <td className="px-3 py-2">
@@ -295,7 +295,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
                 <td className="px-3 py-2">
                   <LinksExternos mini fallback={false} links={r.links} nome={r.razao_social} />
                 </td>
-                <td className="px-3 py-2 text-xs text-slate-400">{r.uf}</td>
+                <td className="px-3 py-2 text-xs text-fg-secondary">{r.uf}</td>
               </tr>
             ))}
           </tbody>
@@ -304,7 +304,7 @@ export default function Tabela({ rows }: { rows: InstComLinks[] }) {
           <div className="border-t border-edge p-3 text-center">
             <button
               onClick={() => setLimite(limite + PAGINA)}
-              className="rounded-lg border border-edge bg-ink-800 px-4 py-2 text-xs font-medium text-slate-300 transition-colors hover:border-certik/40 hover:text-certik"
+              className="rounded-md border border-edge bg-surface-raised px-4 py-2 text-xs font-medium text-fg-secondary transition-colors hover:border-accent/40 hover:text-accent"
             >
               Show more ({exibidas.length - limite} remaining)
             </button>

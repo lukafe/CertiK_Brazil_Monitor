@@ -18,11 +18,16 @@ export default function Sparkline({
   const area = `6,${height - 4} ${pts.join(" ")} ${width - 6},${height - 4}`;
   return (
     <svg width="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="block">
-      <polygon points={area} fill="#3fe0a8" fillOpacity="0.12" />
-      <polyline points={pts.join(" ")} fill="none" stroke="#3fe0a8" strokeWidth="1.8" strokeLinejoin="round" />
-      {valores.map((v, i) => (
-        <circle key={i} cx={px(i)} cy={py(v)} r="2.5" fill="#3fe0a8" />
-      ))}
+      <polygon points={area} fill="var(--accent)" fillOpacity="0.12" />
+      <polyline
+        points={pts.join(" ")}
+        fill="none"
+        stroke="var(--accent)"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      {valores.length <= 12 &&
+        valores.map((v, i) => <circle key={i} cx={px(i)} cy={py(v)} r="2.5" fill="var(--accent)" />)}
     </svg>
   );
 }

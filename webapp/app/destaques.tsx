@@ -11,15 +11,15 @@ function TrendingCard({ r }: { r: InstComLinks }) {
   return (
     <Link
       href={`/inst/${r.cnpj}`}
-      className="rounded-xl border border-edge bg-ink-900 p-3.5 transition-colors hover:border-certik/40 hover:bg-ink-800"
+      className="rounded-lg border border-edge bg-surface p-3.5 transition-colors hover:border-accent/40 hover:bg-surface-raised"
     >
       <div className="flex items-start gap-2.5">
         <Avatar nome={nome} size={34} />
         <div className="min-w-0">
-          <div className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-tight text-white" title={r.razao_social}>
+          <div className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-tight text-fg" title={r.razao_social}>
             {nome}
           </div>
-          <div className="truncate text-[11px] text-slate-500" title={r.segmento}>
+          <div className="truncate text-[11px] text-fg-muted" title={r.segmento}>
             {segCurto(r.segmento)}
           </div>
         </div>
@@ -43,15 +43,15 @@ function TrendingCard({ r }: { r: InstComLinks }) {
 function Ranking({ titulo, itens }: { titulo: string; itens: InstComRating[] }) {
   return (
     <Painel titulo={titulo}>
-      <ul className="divide-y divide-edge/60">
+      <ul className="divide-y divide-edge">
         {itens.map((r, i) => (
           <li key={r.cnpj}>
-            <Link href={`/inst/${r.cnpj}`} className="flex items-center gap-2.5 px-4 py-2.5 transition-colors hover:bg-ink-800">
-              <span className="inline-flex min-w-[26px] justify-center rounded bg-ink-700 px-1 py-0.5 text-[11px] text-slate-500">
+            <Link href={`/inst/${r.cnpj}`} className="flex items-center gap-2.5 px-4 py-2.5 transition-colors hover:bg-surface-raised">
+              <span className="inline-flex min-w-[26px] justify-center rounded bg-surface-overlay px-1 py-0.5 font-mono text-[11px] text-fg-muted">
                 {i + 1}
               </span>
               <Avatar nome={r.nome_fantasia || r.razao_social} size={26} />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-200" title={r.razao_social}>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-fg" title={r.razao_social}>
                 {r.nome_fantasia || r.razao_social}
               </span>
               <ScoreChip score={r.rating} />
@@ -103,13 +103,13 @@ export default function Destaques({ rows }: { rows: InstComLinks[] }) {
     <>
       <section>
         <div className="mb-3 flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-white">Featured institutions</h2>
+          <h2 className="text-lg font-semibold text-fg">Featured institutions</h2>
           {sufixo && (
-            <span className="rounded-full border border-certik/40 bg-certik/10 px-2.5 py-0.5 text-[11px] font-medium text-certik">
+            <span className="rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-[11px] font-medium text-accent">
               {sufixo}
             </span>
           )}
-          <span className="text-slate-600">›</span>
+          <span className="text-fg-muted">›</span>
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {destaque.map((r) => (
