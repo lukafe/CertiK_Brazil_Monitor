@@ -11,7 +11,8 @@ Atualizado em 2026-09-28 a partir de `data/monitor.db`. **Metodologia em 2 passa
    **só 13 foram verificadas como custódia própria de fato**.
 3. **Validação manual (2026-09-28)** — as 13 de custódia própria foram checadas
    contra fontes primárias (ToS, políticas de custódia, docs oficiais):
-   **10 confirmadas**, 1 inconclusiva (Santander), **Bybit Brasil reclassificada
+   **11 confirmadas** (Santander confirmada em 2026-09-29 via FAQ oficial
+   pós-integração Toro), **Bybit Brasil reclassificada
    para híbrida** (Zodia Custody no institucional) e **Ripple refutada** (vende
    *software* de custódia — os clientes detêm as chaves). Saldo final:
    **11 própria · 4 híbridas · 15 terceirizadas · 18 indeterminadas · 5 fora de escopo**.
@@ -51,10 +52,10 @@ Ordenado por rating. **Validação** = checagem manual contra fonte primária
 | 3 | **Onda Finance** (54.049.320/0001-65) | 69.1 | ✅ confirmada | Fireblocks (como ferramenta) | Case oficial Fireblocks: wallet management institucional (fireblocks.com/customers/onda-finance) |
 | 4 | **Payward/Kraken Brasil** (61.533.076/0001-77) | 68.0 | ✅ confirmada | própria | ToS Brasil: "shared blockchain addresses that they control" (kraken.com/legal/br-terms) |
 | 5 | **OnilX** (65.024.286/0001-90) | 66.1 | ✅ confirmada | própria | "Possui custódia própria de ativos digitais" (onilx.com.br/onilx-e-exchange) |
-| 6 | **Coinbase Brasil** (22.268.814/0001-44) | 65.8 | ✅ confirmada (grupo) | grupo Coinbase | User Agreement: "Coinbase retains control over electronic private keys"; p/ não-US o custodiante é Coinbase Bermuda (grupo) |
+| 6 | **Coinbase Brasil** (22.268.814/0001-44) | 65.8 | ✅ confirmada (grupo, revalidada 2026-09-29) | grupo Coinbase | Política legal própria: "Coinbase retains control over electronic private keys" (help.coinbase.com, legal-policies); custódia pela Coinbase, Inc. (Delaware, mesmo grupo) |
 | 7 | **ASA Digital Assets** (60.483.028/0001-59) | 64.3 | ✅ confirmada | grupo ASA | "A custódia dos seus ativos será feita pelo ASA... carteiras segregadas" (asa.com.br/digital-assets) |
 | 8 | **Bitso Brasil** (51.802.405/0001-84) | 63.8 | ✅ confirmada | MPC próprio (+ Coincover) | Coincover é explicitamente "non-custodial disaster recovery" integrado à infra MPC da Bitso |
-| 9 | **Santander SPSAV** (12.455.479/0001-30) | 59.7 | ⚠️ inconclusiva | própria (closed-loop) | Contrato cita "estrutura própria de contas de custódia individualizadas"; closed-loop sem saques — mas nenhuma página primária declara quem detém as chaves |
+| 9 | **Santander SPSAV** (12.455.479/0001-30) | 59.7 | ✅ confirmada (2026-09-29) | própria intra-grupo (closed-loop) | FAQ oficial pós-integração Toro: BTC/ETH direto no app, compras/vendas só em reais, sem depósito/saque cripto → grupo detém as chaves (ajuda.santandercorretora.com.br, art. 46842571446043) |
 | 10 | **Itaú SPSAV / Itaú Digital Assets** (62.718.268/0001-10) | 54.6 | ✅ confirmada | infra própria (AWS Nitro Enclaves) | Case oficial AWS: chaves protegidas em Nitro Enclaves, stack próprio de custódia; "custódia própria" no íon |
 | 11 | **1Money Brasil** (63.083.006/0001-90) | 54.3 | ✅ provisória | TSS-MPC próprio | "Regulated custody powered by TSS-MPC" (1money.com) — nenhum custodiante terceiro nomeado |
 
@@ -146,6 +147,11 @@ descoberta começa com: *quem guarda suas chaves?*
   varejo — auditoria ainda relevante na transição/migração da custódia).
 
 *Validação manual (2026-09-28) feita sobre fontes primárias indexadas (ToS,
-políticas de custódia, cases oficiais AWS/Fireblocks/Coincover). Pendências:
-confirmar página primária do Santander sobre chaves e ToS da Coinbase servido
-no Brasil.*
+políticas de custódia, cases oficiais AWS/Fireblocks/Coincover). Pendências
+resolvidas em 2026-09-29: (1) Santander — FAQ oficial da Santander Corretora
+(pós-integração Toro) confirma BTC/ETH direto no app em modelo closed-loop
+(compras/vendas só em reais, sem depósito/saque cripto), i.e. o grupo detém as
+chaves; entidade legal custodiante exata não divulgada. (2) Coinbase — política
+legal própria ("What does Coinbase do with my digital assets") declara que a
+Coinbase mantém controle das chaves privadas das carteiras hospedadas; custódia
+pela Coinbase, Inc. (Delaware, mesmo grupo).*
