@@ -50,6 +50,17 @@ const ITENS = [
     ),
   },
   {
+    href: "/mica",
+    chave: "mica",
+    label: "MiCA Licenses",
+    icone: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3.6 9h16.8M3.6 15h16.8M12 3a14.5 14.5 0 0 1 0 18M12 3a14.5 14.5 0 0 0 0 18" />
+      </svg>
+    ),
+  },
+  {
     href: "/?grupos=1",
     chave: "grupos",
     label: "Groups",
@@ -78,6 +89,8 @@ function Nav() {
         const ativo =
           it.chave === "custodia"
             ? pathname === "/custodia"
+            : it.chave === "mica"
+            ? pathname === "/mica"
             : pathname === "/" &&
               (it.chave === ""
                 ? !origem && !grupos

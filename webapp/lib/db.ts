@@ -252,6 +252,46 @@ export function getAlvosCustodia(): AlvoCustodia[] {
   });
 }
 
+export type MicaLicenca = {
+  cnpj: string;
+  razao_social: string;
+  nome_fantasia: string | null;
+  segmento: string;
+  origem: string;
+  rating: number;
+  nota: string;
+  grupo: string;
+  entidade_ue: string | null;
+  tipo: string | null;
+  pais: string | null;
+  regulador: string | null;
+  data_autorizacao: string | null;
+  status: string | null;
+  fonte_url: string | null;
+  confianca: number | null;
+  observacao: string | null;
+  atualizado_em: string | null;
+  site: string | null;
+};
+
+/** Empresas do universo cujo grupo possui autorização MiCA na UE (tabela mica_licencas). */
+export function getMicaLicencas(): MicaLicenca[] {
+  return db()
+    .prepare(
+      `SELECT i.cnpj, i.razao_social, i.nome_fantasia, i.segmento, i.origem,
+              COALESCE(r.rating, 0) rating, COALESCE(r.nota, 'D') nota,
+              m.grupo, m.entidade_ue, m.tipo, m.pais, m.regulador, m.data_autorizacao,
+              m.status, m.fonte_url, m.confianca, m.observacao, m.atualizado_em,
+              e.site
+       FROM mica_licencas m
+       JOIN instituicoes i ON i.cnpj = m.cnpj
+       LEFT JOIN ratings r ON r.cnpj = i.cnpj AND r.mes_ref = i.mes_ref
+       LEFT JOIN enriquecimento e ON e.cnpj = i.cnpj
+       ORDER BY m.grupo ASC, i.razao_social ASC`
+    )
+    .all() as MicaLicenca[];
+}
+
 export function getTodosCnpjs(): string[] {
   return (db().prepare("SELECT cnpj FROM instituicoes").all() as { cnpj: string }[]).map((r) => r.cnpj);
 }
